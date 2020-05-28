@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29911.84
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "microclr", "microclr\microclr.csproj", "{1BBE9174-F8B1-4DAA-B5B9-D36C22B2AAF9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "microclr", "microclr\microclr.csproj", "{1BBE9174-F8B1-4DAA-B5B9-D36C22B2AAF9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProgram", "TestProgram\TestProgram.csproj", "{E4BD4F23-F7C3-448A-A364-EB84224ABE50}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestProgram", "TestProgram\TestProgram.csproj", "{E4BD4F23-F7C3-448A-A364-EB84224ABE50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{57C992B2-6D1D-42E0-BBCC-132215FEFADB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{E4BD4F23-F7C3-448A-A364-EB84224ABE50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4BD4F23-F7C3-448A-A364-EB84224ABE50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4BD4F23-F7C3-448A-A364-EB84224ABE50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57C992B2-6D1D-42E0-BBCC-132215FEFADB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57C992B2-6D1D-42E0-BBCC-132215FEFADB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57C992B2-6D1D-42E0-BBCC-132215FEFADB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57C992B2-6D1D-42E0-BBCC-132215FEFADB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -6,11 +6,10 @@ namespace TestProgram
 {
 	class Program
 	{
-		public float Method()
+		public double Method()
 		{
-			int x = 100;
-			float f = 3.14f;
-			return f;
+			double d = 3.14;
+			return d;
 		}
 
 		static void Main(string[] args)
@@ -18,8 +17,10 @@ namespace TestProgram
 			var clr = new MicroClr();
 
 			var method = typeof(Program).GetMethod(nameof(Method));
+			//Console.WriteLine(clr.Disassemble(method));
+
 			//var method = typeof(Program).GetMethod(nameof(Main), BindingFlags.NonPublic | BindingFlags.Static);
-			var ret = clr.Execute<float>(method);
+			var ret = clr.Execute<double>(method);
 			Console.WriteLine(ret);
 		}
 	}

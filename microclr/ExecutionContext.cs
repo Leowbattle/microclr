@@ -24,15 +24,13 @@ namespace microclr
 			ip = 0;
 		}
 
-		public T Execute<T>() where T: unmanaged
+		public void Execute()
 		{
 			Span<ulong> locals = stackalloc ulong[method.GetMethodBody().LocalVariables.Count];
 
 			while (true)
 			{
 				OpCodeValues opcode = ReadOpCode();
-
-				//Console.WriteLine(opcode);
 
 				// This page describes the behaviour of all the instructions.
 				// https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes?view=netcore-3.1
@@ -69,6 +67,9 @@ namespace microclr
 					#region Push a local to the stack
 					case OpCodeValues.Ldloc:
 						Stack.PushULong(locals[ReadUShort()]);
+						break;
+					case OpCodeValues.Ldloc_S:
+						Stack.PushULong(locals[il[ip++]]);
 						break;
 					case OpCodeValues.Ldloc_0:
 						Stack.PushULong(locals[0]);
@@ -144,14 +145,40 @@ namespace microclr
 						break;
 					#endregion
 
+					#region Operators
+					//case OpCodeValues.Add:
+					//	break;
+					#endregion
+
 					case OpCodeValues.Ret:
-						var ret = Stack.PopULong();
-						return MemoryMarshal.Cast<ulong, T>(MemoryMarshal.CreateSpan(ref ret, 1))[0];
+						return;
 
 					default:
 						throw new UnsupportedInstructionException(opcode);
 				}
 			}
+		}
+
+		public T Execute<T>() where T: unmanaged
+		{
+			Execute();
+			var ret = Stack.PopULong();
+			return MemoryMarshal.Cast<ulong, T>(MemoryMarshal.CreateSpan(ref ret, 1))[0];
+		}
+
+		internal string Disassemble()
+		{
+			// TODO This is wrong and should be fixed
+
+			StringBuilder sb = new StringBuilder();
+
+			while (ip != il.Length)
+			{
+				var op = ReadOpCode();
+				sb.AppendLine(op.ToString());
+			}
+
+			return sb.ToString();
 		}
 
 		private OpCodeValues ReadOpCode()
@@ -168,35 +195,35 @@ namespace microclr
 		private ushort ReadUShort()
 		{
 			ushort i = BitConverter.ToUInt16(il, ip);
-			ip += 2;
+			ip += sizeof(ushort);
 			return i;
 		}
 
 		private int ReadInt()
 		{
-			int i = BitConverter.ToInt32(il, ip += 4);
-			ip += 4;
+			int i = BitConverter.ToInt32(il, ip);
+			ip += sizeof(int);
 			return i;
 		}
 
 		private long ReadLong()
 		{
-			long i = BitConverter.ToInt64(il, ip += 8);
-			ip += 8;
+			long i = BitConverter.ToInt64(il, ip);
+			ip += sizeof(long);
 			return i;
 		}
 
 		private float ReadFloat()
 		{
 			float f = BitConverter.ToSingle(il, ip);
-			ip += 4;
+			ip += sizeof(float);
 			return f;
 		}
 
 		private double ReadDouble()
 		{
-			double d = BitConverter.ToDouble(il, ip += 4);
-			ip += 4;
+			double d = BitConverter.ToDouble(il, ip);
+			ip += sizeof(double);
 			return d;
 		}
 	}
