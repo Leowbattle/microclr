@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 
@@ -11,6 +12,10 @@ namespace Tests
 	[TestClass]
 	public class Tests
 	{
+#pragma warning disable CS0219 // Variable assigned but not used
+#pragma warning disable IDE0059// Variable assigned but not used
+#pragma warning disable CS0162 // Unreachable code
+
 		static void Run(string name)
 		{
 			var method = typeof(Tests).GetMethod(name, BindingFlags.NonPublic | BindingFlags.Static);
@@ -23,6 +28,7 @@ namespace Tests
 			return new MicroClr().Execute<T>(method);
 		}
 
+		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static void EmptyMethod()
 		{
 
@@ -38,6 +44,7 @@ namespace Tests
 		/// There are 256 local variables in this function, so it uses all of the local variable storing instructions
 		/// (Stloc, Stloc_S, Stloc_0, Stloc_1, Stloc_2, Stloc_3)
 		/// </summary>
+		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static void LocalVariables()
 		{
 			int local0 = 0;
@@ -308,6 +315,7 @@ namespace Tests
 		/// Returns an int using Ldc_I4_S
 		/// </summary>
 		/// <returns></returns>
+		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static int ReturnSmallInt()
 		{
 			return 42;
@@ -317,6 +325,7 @@ namespace Tests
 		/// Returns an int using Ldc_I4
 		/// </summary>
 		/// <returns></returns>
+		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static int ReturnLargeInt()
 		{
 			return 1000000;
@@ -326,6 +335,7 @@ namespace Tests
 		/// Returns a float using Ldc_R4
 		/// </summary>
 		/// <returns></returns>
+		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static float ReturnFloat()
 		{
 			return 3.14159f;
@@ -335,12 +345,14 @@ namespace Tests
 		/// Returns a double using Ldc_R8
 		/// </summary>
 		/// <returns></returns>
+		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static double ReturnDouble()
 		{
 			return 2.71828;
 		}
 
 		[TestMethod]
+		[MethodImpl(MethodImplOptions.NoOptimization)]
 		public void TestSimpleReturn()
 		{
 			Assert.AreEqual(ReturnSmallInt(), Run<int>(nameof(ReturnSmallInt)));
@@ -351,6 +363,7 @@ namespace Tests
 
 		[TestMethod]
 		[ExpectedException(typeof(IncorrectReturnTypeException))]
+		[MethodImpl(MethodImplOptions.NoOptimization)]
 		public void TestIncorrectReturnType()
 		{
 			Run<int>(nameof(ReturnFloat));
@@ -358,9 +371,200 @@ namespace Tests
 
 		[TestMethod]
 		[ExpectedException(typeof(IncorrectReturnTypeException))]
+		[MethodImpl(MethodImplOptions.NoOptimization)]
 		public void TestVoidReturnType()
 		{
 			Run<int>(nameof(EmptyMethod));
+		}
+
+		/// <summary>
+		/// Loads ints using Ldc_I4_[0 to 8] and Ldc_I4_M1
+		/// </summary>
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static void LoadSmallIntConstants()
+		{
+			int x = -1;
+			x = 0;
+			x = 1;
+			x = 2;
+			x = 3;
+			x = 4;
+			x = 5;
+			x = 6;
+			x = 7;
+			x = 8;
+		}
+
+		[TestMethod]
+		public void TestSmallIntConstantLoading()
+		{
+			Run(nameof(LoadSmallIntConstants));
+		}
+
+		/// <summary>
+		/// Unconditional jump using Br_S
+		/// </summary>
+		/// <returns></returns>
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static bool UnconditionalJump()
+		{
+			goto label1;
+			return true;
+			label1:
+			return false;
+		}
+
+		/// <summary>
+		/// Unconditional jump using Br
+		/// </summary>
+		/// <returns></returns>
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static bool FarUnconditionalJump()
+		{
+			goto farLabel;
+
+			label2:
+			int local0 = 0;
+			int local1 = 1;
+			int local2 = 2;
+			int local3 = 3;
+			int local4 = 4;
+			int local5 = 5;
+			int local6 = 6;
+			int local7 = 7;
+			int local8 = 8;
+			int local9 = 9;
+			int local10 = 10;
+			int local11 = 11;
+			int local12 = 12;
+			int local13 = 13;
+			int local14 = 14;
+			int local15 = 15;
+			int local16 = 16;
+			int local17 = 17;
+			int local18 = 18;
+			int local19 = 19;
+			int local20 = 20;
+			int local21 = 21;
+			int local22 = 22;
+			int local23 = 23;
+			int local24 = 24;
+			int local25 = 25;
+			int local26 = 26;
+			int local27 = 27;
+			int local28 = 28;
+			int local29 = 29;
+			int local30 = 30;
+			int local31 = 31;
+			int local32 = 32;
+			int local33 = 33;
+			int local34 = 34;
+			int local35 = 35;
+			int local36 = 36;
+			int local37 = 37;
+			int local38 = 38;
+			int local39 = 39;
+			int local40 = 40;
+			int local41 = 41;
+			int local42 = 42;
+			int local43 = 43;
+			int local44 = 44;
+			int local45 = 45;
+			int local46 = 46;
+			int local47 = 47;
+			int local48 = 48;
+			int local49 = 49;
+			int local50 = 50;
+			int local51 = 51;
+			int local52 = 52;
+			int local53 = 53;
+			int local54 = 54;
+			int local55 = 55;
+			int local56 = 56;
+			int local57 = 57;
+			int local58 = 58;
+			int local59 = 59;
+			int local60 = 60;
+			int local61 = 61;
+			int local62 = 62;
+			int local63 = 63;
+			int local64 = 64;
+			return true;
+
+			farLabel:
+			goto label2;
+			return false;
+		}
+
+		[TestMethod]
+		public void TestUnconditionalJump()
+		{
+			Assert.AreEqual(UnconditionalJump(), Run<bool>(nameof(UnconditionalJump)));
+			Assert.AreEqual(FarUnconditionalJump(), Run<bool>(nameof(FarUnconditionalJump)));
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static int SimpleAdd()
+		{
+			int a = 1;
+			int b = 2;
+			return a + b;
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static uint SimpleAddUInt()
+		{
+			uint a = 5;
+			uint b = 6;
+			return a + b;
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static int AddIntOverflow()
+		{
+			int a = 2000000000;
+			int b = 2000000000;
+			return a + b;
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static uint AddUIntOverflow()
+		{
+			uint a = 4000000000;
+			uint b = 4000000000;
+			return a + b;
+		}
+
+		[TestMethod]
+		public void TestSimpleMaths()
+		{
+			Assert.AreEqual(SimpleAdd(), Run<int>(nameof(SimpleAdd)));
+			Assert.AreEqual(SimpleAddUInt(), Run<uint>(nameof(SimpleAddUInt)));
+			Assert.AreEqual(AddIntOverflow(), Run<int>(nameof(AddIntOverflow)));
+			Assert.AreEqual(AddUIntOverflow(), Run<uint>(nameof(AddUIntOverflow)));
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static float SimpleAddFloat()
+		{
+			float a = 0.1f;
+			float b = 0.2f;
+			return a + b;
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static double SimpleAddDouble()
+		{
+			double a = 0.1;
+			double b = 0.2;
+			return a + b;
+		}
+
+		[TestMethod]
+		public void TestSimpleFloatingPointMaths()
+		{
+			Assert.AreEqual(SimpleAddFloat(), Run<float>(nameof(SimpleAddFloat)));
+			Assert.AreEqual(SimpleAddDouble(), Run<double>(nameof(SimpleAddDouble)));
 		}
 	}
 }
