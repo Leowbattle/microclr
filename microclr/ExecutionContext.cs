@@ -190,6 +190,25 @@ namespace microclr
 						}
 						Stack.PushLong(Stack.PopLong() * Stack.PopLong());
 						break;
+					case OpCodeValues.Div:
+						if (Stack.Peek().Type == VariableType.Float)
+						{
+							var divisorf = Stack.PopFloat();
+							var dividendf = Stack.PopFloat();
+							Stack.PushFloat(dividendf / divisorf);
+							break;
+						}
+						else if (Stack.Peek().Type == VariableType.Double)
+						{
+							var divisord = Stack.PopDouble();
+							var dividendd = Stack.PopDouble();
+							Stack.PushDouble(dividendd / divisord);
+							break;
+						}
+						var divisor = Stack.PopLong();
+						var dividend = Stack.PopLong();
+						Stack.PushLong(dividend / divisor);
+						break;
 					#endregion
 
 					#region Return

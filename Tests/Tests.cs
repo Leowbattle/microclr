@@ -726,5 +726,74 @@ namespace Tests
 			RunTest(nameof(SimpleDoubleMultiply));
 		}
 		#endregion
+
+		#region Int divide
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static int SimpleDivide()
+		{
+			int a = 4;
+			int b = -4;
+			return a / b;
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static int DivideByLargerNumber()
+		{
+			int a = 100;
+			int b = 12345;
+			return a / b;
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static int DivideByZero()
+		{
+			int a = 42;
+			int b = 0;
+			return a / b;
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(DivideByZeroException))]
+		public void TestIntegerDivision()
+		{
+			RunTest(nameof(SimpleDivide));
+			RunTest(nameof(DivideByLargerNumber));
+			Run<int>(nameof(DivideByZero));
+		}
+		#endregion
+
+		#region Float divide
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static float SimpleDivideFloat()
+		{
+			float a = 1;
+			float b = -3;
+			return a / b;
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static float FloatDivideByZero()
+		{
+			float a = 10;
+			float b = 0;
+			return a / b;
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static double SimpleDivideDouble()
+		{
+			double a = 1;
+			double b = 3.14159;
+			return a / b;
+		}
+
+		[TestMethod]
+		public void TestFloatDivide()
+		{
+			RunTest(nameof(SimpleDivideFloat));
+			RunTest(nameof(FloatDivideByZero));
+			RunTest(nameof(SimpleDivideDouble));
+		}
+		#endregion
 	}
 }
