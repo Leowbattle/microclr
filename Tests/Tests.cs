@@ -28,6 +28,7 @@ namespace Tests
 			return new MicroClr().Execute<T>(method);
 		}
 
+		#region Empty method
 		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static void EmptyMethod()
 		{
@@ -39,7 +40,9 @@ namespace Tests
 		{
 			Run(nameof(EmptyMethod));
 		}
+		#endregion
 
+		#region Local variables
 		/// <summary>
 		/// There are 256 local variables in this function, so it uses all of the local variable storing instructions
 		/// (Stloc, Stloc_S, Stloc_0, Stloc_1, Stloc_2, Stloc_3)
@@ -310,7 +313,9 @@ namespace Tests
 		{
 			Run(nameof(LocalVariables));
 		}
+		#endregion
 
+		#region Simple returns
 		/// <summary>
 		/// Returns an int using Ldc_I4_S
 		/// </summary>
@@ -376,7 +381,9 @@ namespace Tests
 		{
 			Run<int>(nameof(EmptyMethod));
 		}
+		#endregion
 
+		#region Small int constants
 		/// <summary>
 		/// Loads ints using Ldc_I4_[0 to 8] and Ldc_I4_M1
 		/// </summary>
@@ -400,7 +407,9 @@ namespace Tests
 		{
 			Run(nameof(LoadSmallIntConstants));
 		}
+		#endregion
 
+		#region Unconditional jump
 		/// <summary>
 		/// Unconditional jump using Br_S
 		/// </summary>
@@ -502,7 +511,9 @@ namespace Tests
 			Assert.AreEqual(UnconditionalJump(), Run<bool>(nameof(UnconditionalJump)));
 			Assert.AreEqual(FarUnconditionalJump(), Run<bool>(nameof(FarUnconditionalJump)));
 		}
+		#endregion
 
+		#region Int add
 		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static int SimpleAdd()
 		{
@@ -536,19 +547,72 @@ namespace Tests
 		}
 
 		[TestMethod]
-		public void TestSimpleMaths()
+		public void TestIntAdd()
 		{
 			Assert.AreEqual(SimpleAdd(), Run<int>(nameof(SimpleAdd)));
 			Assert.AreEqual(SimpleAddUInt(), Run<uint>(nameof(SimpleAddUInt)));
 			Assert.AreEqual(AddIntOverflow(), Run<int>(nameof(AddIntOverflow)));
 			Assert.AreEqual(AddUIntOverflow(), Run<uint>(nameof(AddUIntOverflow)));
 		}
+		#endregion
 
+		#region Int subtract
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static int SimpleSubtract()
+		{
+			int a = 1;
+			int b = 2;
+			return a - b;
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static uint SimpleSubtractUInt()
+		{
+			uint a = 6;
+			uint b = 5;
+			return a - b;
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static int SubtractIntUnderflow()
+		{
+			int a = 0;
+			int b = 2000000000;
+			return a - b;
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static uint SubtractUIntUnderflow()
+		{
+			uint a = 0;
+			uint b = 4000000000;
+			return a - b;
+		}
+
+		[TestMethod]
+		public void TestIntSubtract()
+		{
+			Assert.AreEqual(SimpleSubtract(), Run<int>(nameof(SimpleSubtract)));
+			Assert.AreEqual(SimpleSubtractUInt(), Run<uint>(nameof(SimpleSubtractUInt)));
+			Assert.AreEqual(SubtractIntUnderflow(), Run<int>(nameof(SubtractIntUnderflow)));
+			Assert.AreEqual(SubtractUIntUnderflow(), Run<uint>(nameof(SubtractUIntUnderflow)));
+		}
+		#endregion
+
+		#region Float add
 		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static float SimpleAddFloat()
 		{
 			float a = 0.1f;
 			float b = 0.2f;
+			return a + b;
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static float AddFloatOverflow()
+		{
+			float a = float.MaxValue;
+			float b = float.MaxValue;
 			return a + b;
 		}
 
@@ -561,10 +625,46 @@ namespace Tests
 		}
 
 		[TestMethod]
-		public void TestSimpleFloatingPointMaths()
+		public void TestFloatAdd()
 		{
 			Assert.AreEqual(SimpleAddFloat(), Run<float>(nameof(SimpleAddFloat)));
 			Assert.AreEqual(SimpleAddDouble(), Run<double>(nameof(SimpleAddDouble)));
+			Assert.AreEqual(AddFloatOverflow(), Run<float>(nameof(AddFloatOverflow)));
 		}
+		#endregion
+
+		#region Float subtract
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static float SimpleSubtractFloat()
+		{
+			float a = 0.1f;
+			float b = 0.2f;
+			return a - b;
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static float SubtractFloatOverflow()
+		{
+			float a = float.MinValue;
+			float b = float.MinValue;
+			return a - b;
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static double SimpleSubtractDouble()
+		{
+			double a = 0.1;
+			double b = 0.2;
+			return a - b;
+		}
+
+		[TestMethod]
+		public void TestFloatSubtract()
+		{
+			Assert.AreEqual(SimpleSubtractFloat(), Run<float>(nameof(SimpleSubtractFloat)));
+			Assert.AreEqual(SimpleSubtractDouble(), Run<double>(nameof(SimpleSubtractDouble)));
+			Assert.AreEqual(SubtractFloatOverflow(), Run<float>(nameof(SubtractFloatOverflow)));
+		}
+		#endregion
 	}
 }

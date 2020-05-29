@@ -164,6 +164,19 @@ namespace microclr
 						}
 						Stack.PushLong(Stack.PopLong() + Stack.PopLong());
 						break;
+					case OpCodeValues.Sub:
+						if (Stack.Peek().Type == VariableType.Float)
+						{
+							Stack.PushFloat(-Stack.PopFloat() + Stack.PopFloat());
+							break;
+						}
+						else if (Stack.Peek().Type == VariableType.Double)
+						{
+							Stack.PushDouble(-Stack.PopDouble() + Stack.PopDouble());
+							break;
+						}
+						Stack.PushLong(-Stack.PopLong() + Stack.PopLong());
+						break;
 					#endregion
 
 					case OpCodeValues.Ret:
@@ -175,7 +188,7 @@ namespace microclr
 			}
 		}
 
-		public T Execute<T>() where T: unmanaged
+		public T Execute<T>() where T : unmanaged
 		{
 			Execute();
 			var ret = Stack.PopULong();
