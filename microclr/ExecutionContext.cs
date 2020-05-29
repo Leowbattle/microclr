@@ -94,7 +94,7 @@ namespace microclr
 						Stack.PushInt(ReadInt());
 						break;
 					case OpCodeValues.Ldc_I4_S:
-						Stack.PushInt(il[ip++]);
+						Stack.PushInt((sbyte)il[ip++]);
 						break;
 					case OpCodeValues.Ldc_I4_0:
 						Stack.PushInt(0);
@@ -176,6 +176,19 @@ namespace microclr
 							break;
 						}
 						Stack.PushLong(-Stack.PopLong() + Stack.PopLong());
+						break;
+					case OpCodeValues.Mul:
+						if (Stack.Peek().Type == VariableType.Float)
+						{
+							Stack.PushFloat(Stack.PopFloat() * Stack.PopFloat());
+							break;
+						}
+						else if (Stack.Peek().Type == VariableType.Double)
+						{
+							Stack.PushDouble(Stack.PopDouble() * Stack.PopDouble());
+							break;
+						}
+						Stack.PushLong(Stack.PopLong() * Stack.PopLong());
 						break;
 					#endregion
 

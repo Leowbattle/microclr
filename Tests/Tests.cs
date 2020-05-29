@@ -12,17 +12,20 @@ namespace Tests
 	[TestClass]
 	public class Tests
 	{
+		#region Suppress warnings
 #pragma warning disable CS0219 // Variable assigned but not used
 #pragma warning disable IDE0059// Variable assigned but not used
 #pragma warning disable CS0162 // Unreachable code
+		#endregion
 
+		#region Test executor
 		static object Run(string name)
 		{
 			var method = typeof(Tests).GetMethod(name, BindingFlags.NonPublic | BindingFlags.Static);
 			return new MicroClr().Execute(method);
 		}
 
-		static T Run<T>(string name) where T: unmanaged
+		static T Run<T>(string name) where T : unmanaged
 		{
 			var method = typeof(Tests).GetMethod(name, BindingFlags.NonPublic | BindingFlags.Static);
 			return new MicroClr().Execute<T>(method);
@@ -35,6 +38,7 @@ namespace Tests
 			var microclr = new MicroClr().Execute(method);
 			Assert.AreEqual(dotnet, microclr);
 		}
+		#endregion
 
 		#region Empty method
 		[MethodImpl(MethodImplOptions.NoOptimization)]
@@ -670,6 +674,56 @@ namespace Tests
 			RunTest(nameof(SimpleSubtractFloat));
 			RunTest(nameof(SimpleSubtractDouble));
 			RunTest(nameof(SubtractFloatOverflow));
+		}
+		#endregion
+
+		#region Int multiply
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static int SimpleIntMultiply()
+		{
+			int a = 6;
+			int b = 7;
+			return a * b;
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static int IntMultiplyNegative()
+		{
+			int a = 1;
+			int b = -7;
+			return a * b;
+		}
+
+		[TestMethod]
+		public void TestIntMultiply()
+		{
+			RunTest(nameof(SimpleIntMultiply));
+			RunTest(nameof(IntMultiplyNegative));
+		}
+		#endregion
+
+		#region Float multiply
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static float SimpleFloatMultiply()
+		{
+			float a = -6;
+			float b = 3.14159f;
+			return a * b;
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static double SimpleDoubleMultiply()
+		{
+			double a = -4;
+			double b = 2.71828;
+			return a * b;
+		}
+
+		[TestMethod]
+		public void TestFloatMultiply()
+		{
+			RunTest(nameof(SimpleFloatMultiply));
+			RunTest(nameof(SimpleDoubleMultiply));
 		}
 		#endregion
 	}
