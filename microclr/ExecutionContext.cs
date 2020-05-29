@@ -11,18 +11,109 @@ namespace microclr
 	struct ExecutionContext
 	{
 		MethodInfo method;
+		Variable[] args;
+
 		byte[] il;
 		int ip;
 
 		MicroClrStack Stack;
 
-		public ExecutionContext(MethodInfo method, MicroClrStack stack)
+		public ExecutionContext(MethodInfo method, object[] args, MicroClrStack stack)
 		{
 			this.method = method;
+			ValidateArgs(method, args);
+			this.args = ConvertArgs(method, args);
+
 			Stack = stack;
 
 			il = method.GetMethodBody().GetILAsByteArray();
 			ip = 0;
+		}
+
+		private static Variable[] ConvertArgs(MethodInfo method, object[] args)
+		{
+			if (method.GetParameters().Length != args.Length)
+			{
+				throw new ParameterCountException(method.GetParameters().Length, args.Length);
+			}
+
+			for (int i = 0; i < args.Length; i++)
+			{
+				var p = method.GetParameters()[i];
+				if (p.ParameterType != args[i].GetType())
+				{
+					throw new ParameterTypeException(i, p.ParameterType, args[i].GetType());
+				}
+			}
+
+			var ret = new Variable[args.Length];
+			for (int i = 0; i < args.Length; i++)
+			{
+				var argT = args[i].GetType();
+				if (argT == typeof(sbyte))
+				{
+					ret[i] = new Variable((sbyte)args[i]);
+				}
+				else if (argT == typeof(byte))
+				{
+					ret[i] = new Variable((byte)args[i]);
+				}
+				else if (argT == typeof(short))
+				{
+					ret[i] = new Variable((short)args[i]);
+				}
+				else if (argT == typeof(ushort))
+				{
+					ret[i] = new Variable((ushort)args[i]);
+				}
+				else if (argT == typeof(int))
+				{
+					ret[i] = new Variable((int)args[i]);
+				}
+				else if (argT == typeof(uint))
+				{
+					ret[i] = new Variable((uint)args[i]);
+				}
+				else if (argT == typeof(long))
+				{
+					ret[i] = new Variable((long)args[i]);
+				}
+				else if (argT == typeof(ulong))
+				{
+					ret[i] = new Variable((ulong)args[i]);
+				}
+				else if (argT == typeof(float))
+				{
+					ret[i] = new Variable((float)args[i]);
+				}
+				else if (argT == typeof(double))
+				{
+					ret[i] = new Variable((double)args[i]);
+				}
+				else
+				{
+					throw new NotImplementedException();
+				}
+			}
+
+			return ret;
+		}
+
+		private static void ValidateArgs(MethodInfo method, object[] args)
+		{
+			if (method.GetParameters().Length != args.Length)
+			{
+				throw new ParameterCountException(method.GetParameters().Length, args.Length);
+			}
+
+			for (int i = 0; i < args.Length; i++)
+			{
+				var p = method.GetParameters()[i];
+				if (p.ParameterType != args[i].GetType())
+				{
+					throw new ParameterTypeException(i, p.ParameterType, args[i].GetType());
+				}
+			}
 		}
 
 		public object Execute()
@@ -42,7 +133,26 @@ namespace microclr
 					case OpCodeValues.Nop:
 						break;
 
-					// TODO Ldarg
+					#region Argument loading
+					case OpCodeValues.Ldarg:
+						Stack.Push(args[ReadShort()]);
+						break;
+					case OpCodeValues.Ldarg_S:
+						Stack.Push(args[il[ip++]]);
+						break;
+					case OpCodeValues.Ldarg_0:
+						Stack.Push(args[0]);
+						break;
+					case OpCodeValues.Ldarg_1:
+						Stack.Push(args[1]);
+						break;
+					case OpCodeValues.Ldarg_2:
+						Stack.Push(args[2]);
+						break;
+					case OpCodeValues.Ldarg_3:
+						Stack.Push(args[3]);
+						break;
+					#endregion
 
 					#region Store a value to a local variable
 					case OpCodeValues.Stloc:
@@ -339,6 +449,13 @@ namespace microclr
 			}
 
 			return opcode;
+		}
+
+		private short ReadShort()
+		{
+			short i = BitConverter.ToInt16(il, ip);
+			ip += sizeof(short);
+			return i;
 		}
 
 		private ushort ReadUShort()

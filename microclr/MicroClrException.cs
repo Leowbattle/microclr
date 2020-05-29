@@ -33,4 +33,34 @@ namespace microclr
 
 		public override string Message => $"Requested return type {Requested} does not match {Expected}";
 	}
+
+	public class ParameterCountException : MicroClrException
+	{
+		public int Expected { get; }
+		public int Given { get; }
+
+		public ParameterCountException(int expected, int given)
+		{
+			Expected = expected;
+			Given = given;
+		}
+
+		public override string Message => $"Incorrect number of parameters {Given}, expected {Expected}";
+	}
+
+	public class ParameterTypeException : MicroClrException
+	{
+		public int Index { get; }
+		public Type Expected { get; }
+		public Type Given { get; }
+
+		public ParameterTypeException(int index, Type expected, Type given)
+		{
+			Index = index;
+			Expected = expected;
+			Given = given;
+		}
+
+		public override string Message => $"Incorrect parameter type {Given} for parameter {Index}, expected {Expected}";
+	}
 }

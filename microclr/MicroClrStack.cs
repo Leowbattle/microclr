@@ -4,38 +4,6 @@ namespace microclr
 {
 	class MicroClrStack
 	{
-		public enum VariableType
-		{
-			Int,
-			UInt,
-			Float,
-			Double
-		}
-
-		public struct Variable
-		{
-			public ulong Value;
-			public VariableType Type;
-
-			public Variable(ulong value, VariableType type)
-			{
-				Value = value;
-				Type = type;
-			}
-
-			public override string ToString()
-			{
-				return Type switch
-				{
-					VariableType.Int => ((long)Value).ToString(),
-					VariableType.UInt => Value.ToString(),
-					VariableType.Float => BitConverter.Int32BitsToSingle((int)Value).ToString(), 
-					VariableType.Double => BitConverter.Int64BitsToDouble((long)Value).ToString(), 
-					_ => Value.ToString()
-				};
-			}
-		}
-
 		Variable[] Stack = new Variable[1024];
 		int StackPointer = 0;
 
