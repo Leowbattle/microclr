@@ -16,16 +16,24 @@ namespace Tests
 #pragma warning disable IDE0059// Variable assigned but not used
 #pragma warning disable CS0162 // Unreachable code
 
-		static void Run(string name)
+		static object Run(string name)
 		{
 			var method = typeof(Tests).GetMethod(name, BindingFlags.NonPublic | BindingFlags.Static);
-			new MicroClr().Execute(method);
+			return new MicroClr().Execute(method);
 		}
 
-		static T Run<T>(string name) where T : unmanaged
+		static T Run<T>(string name) where T: unmanaged
 		{
 			var method = typeof(Tests).GetMethod(name, BindingFlags.NonPublic | BindingFlags.Static);
 			return new MicroClr().Execute<T>(method);
+		}
+
+		static void RunTest(string name)
+		{
+			var method = typeof(Tests).GetMethod(name, BindingFlags.NonPublic | BindingFlags.Static);
+			var dotnet = method.Invoke(null, null);
+			var microclr = new MicroClr().Execute(method);
+			Assert.AreEqual(dotnet, microclr);
 		}
 
 		#region Empty method
@@ -38,7 +46,7 @@ namespace Tests
 		[TestMethod]
 		public void TestEmptyMethod()
 		{
-			Run(nameof(EmptyMethod));
+			RunTest(nameof(EmptyMethod));
 		}
 		#endregion
 
@@ -311,7 +319,7 @@ namespace Tests
 		[TestMethod]
 		public void TestLocalVariables()
 		{
-			Run(nameof(LocalVariables));
+			RunTest(nameof(LocalVariables));
 		}
 		#endregion
 
@@ -357,18 +365,16 @@ namespace Tests
 		}
 
 		[TestMethod]
-		[MethodImpl(MethodImplOptions.NoOptimization)]
 		public void TestSimpleReturn()
 		{
-			Assert.AreEqual(ReturnSmallInt(), Run<int>(nameof(ReturnSmallInt)));
-			Assert.AreEqual(ReturnLargeInt(), Run<int>(nameof(ReturnLargeInt)));
-			Assert.AreEqual(ReturnFloat(), Run<float>(nameof(ReturnFloat)));
-			Assert.AreEqual(ReturnDouble(), Run<double>(nameof(ReturnDouble)));
+			RunTest(nameof(ReturnSmallInt));
+			RunTest(nameof(ReturnLargeInt));
+			RunTest(nameof(ReturnFloat));
+			RunTest(nameof(ReturnDouble));
 		}
 
 		[TestMethod]
 		[ExpectedException(typeof(IncorrectReturnTypeException))]
-		[MethodImpl(MethodImplOptions.NoOptimization)]
 		public void TestIncorrectReturnType()
 		{
 			Run<int>(nameof(ReturnFloat));
@@ -376,9 +382,9 @@ namespace Tests
 
 		[TestMethod]
 		[ExpectedException(typeof(IncorrectReturnTypeException))]
-		[MethodImpl(MethodImplOptions.NoOptimization)]
 		public void TestVoidReturnType()
 		{
+			Assert.AreEqual(Run(nameof(EmptyMethod)), null);
 			Run<int>(nameof(EmptyMethod));
 		}
 		#endregion
@@ -405,7 +411,7 @@ namespace Tests
 		[TestMethod]
 		public void TestSmallIntConstantLoading()
 		{
-			Run(nameof(LoadSmallIntConstants));
+			RunTest(nameof(LoadSmallIntConstants));
 		}
 		#endregion
 
@@ -508,8 +514,8 @@ namespace Tests
 		[TestMethod]
 		public void TestUnconditionalJump()
 		{
-			Assert.AreEqual(UnconditionalJump(), Run<bool>(nameof(UnconditionalJump)));
-			Assert.AreEqual(FarUnconditionalJump(), Run<bool>(nameof(FarUnconditionalJump)));
+			RunTest(nameof(UnconditionalJump));
+			RunTest(nameof(FarUnconditionalJump));
 		}
 		#endregion
 
@@ -549,10 +555,10 @@ namespace Tests
 		[TestMethod]
 		public void TestIntAdd()
 		{
-			Assert.AreEqual(SimpleAdd(), Run<int>(nameof(SimpleAdd)));
-			Assert.AreEqual(SimpleAddUInt(), Run<uint>(nameof(SimpleAddUInt)));
-			Assert.AreEqual(AddIntOverflow(), Run<int>(nameof(AddIntOverflow)));
-			Assert.AreEqual(AddUIntOverflow(), Run<uint>(nameof(AddUIntOverflow)));
+			RunTest(nameof(SimpleAdd));
+			RunTest(nameof(SimpleAddUInt));
+			RunTest(nameof(AddIntOverflow));
+			RunTest(nameof(AddUIntOverflow));
 		}
 		#endregion
 
@@ -592,10 +598,10 @@ namespace Tests
 		[TestMethod]
 		public void TestIntSubtract()
 		{
-			Assert.AreEqual(SimpleSubtract(), Run<int>(nameof(SimpleSubtract)));
-			Assert.AreEqual(SimpleSubtractUInt(), Run<uint>(nameof(SimpleSubtractUInt)));
-			Assert.AreEqual(SubtractIntUnderflow(), Run<int>(nameof(SubtractIntUnderflow)));
-			Assert.AreEqual(SubtractUIntUnderflow(), Run<uint>(nameof(SubtractUIntUnderflow)));
+			RunTest(nameof(SimpleSubtract));
+			RunTest(nameof(SimpleSubtractUInt));
+			RunTest(nameof(SubtractIntUnderflow));
+			RunTest(nameof(SubtractUIntUnderflow));
 		}
 		#endregion
 
@@ -627,9 +633,9 @@ namespace Tests
 		[TestMethod]
 		public void TestFloatAdd()
 		{
-			Assert.AreEqual(SimpleAddFloat(), Run<float>(nameof(SimpleAddFloat)));
-			Assert.AreEqual(SimpleAddDouble(), Run<double>(nameof(SimpleAddDouble)));
-			Assert.AreEqual(AddFloatOverflow(), Run<float>(nameof(AddFloatOverflow)));
+			RunTest(nameof(SimpleAddFloat));
+			RunTest(nameof(SimpleAddDouble));
+			RunTest(nameof(AddFloatOverflow));
 		}
 		#endregion
 
@@ -661,9 +667,9 @@ namespace Tests
 		[TestMethod]
 		public void TestFloatSubtract()
 		{
-			Assert.AreEqual(SimpleSubtractFloat(), Run<float>(nameof(SimpleSubtractFloat)));
-			Assert.AreEqual(SimpleSubtractDouble(), Run<double>(nameof(SimpleSubtractDouble)));
-			Assert.AreEqual(SubtractFloatOverflow(), Run<float>(nameof(SubtractFloatOverflow)));
+			RunTest(nameof(SimpleSubtractFloat));
+			RunTest(nameof(SimpleSubtractDouble));
+			RunTest(nameof(SubtractFloatOverflow));
 		}
 		#endregion
 	}

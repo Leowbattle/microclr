@@ -25,7 +25,7 @@ namespace microclr
 			ip = 0;
 		}
 
-		public void Execute()
+		public object Execute()
 		{
 			Span<Variable> locals = stackalloc Variable[method.GetMethodBody().LocalVariables.Count];
 
@@ -179,8 +179,82 @@ namespace microclr
 						break;
 					#endregion
 
+					#region Return
 					case OpCodeValues.Ret:
-						return;
+						// I feel like there may be a better way to do this than
+						// switching on the return type and boxing the return value
+						var retType = method.ReturnType;
+						if (retType == typeof(void))
+						{
+							return null;
+						}
+						else
+						{
+							var ret = Stack.Pop();
+							if (retType == typeof(sbyte))
+							{
+								return (sbyte)ret.Value;
+							}
+							else if (retType == typeof(byte))
+							{
+								return (byte)ret.Value;
+							}
+							else if (retType == typeof(short))
+							{
+								return (short)ret.Value;
+							}
+							else if (retType == typeof(ushort))
+							{
+								return (ushort)ret.Value;
+							}
+							else if (retType == typeof(int))
+							{
+								return (int)ret.Value;
+							}
+							else if (retType == typeof(uint))
+							{
+								return (uint)ret.Value;
+							}
+							else if (retType == typeof(long))
+							{
+								return (long)ret.Value;
+							}
+							else if (retType == typeof(ulong))
+							{
+								return ret.Value;
+							}
+							else if (retType == typeof(float))
+							{
+								return BitConverter.Int32BitsToSingle((int)ret.Value);
+							}
+							else if (retType == typeof(double))
+							{
+								return BitConverter.Int64BitsToDouble((long)ret.Value);
+							}
+							else if (retType == typeof(bool))
+							{
+								return ret.Value != 0;
+							}
+							else
+							{
+								throw new NotImplementedException();
+							}
+						}
+					//var ret = Stack.Pop();
+					//switch (ret.Type)
+					//{
+					//	case VariableType.Int:
+					//		return (long)ret.Value;
+					//	case VariableType.UInt:
+					//		return ret.Value;
+					//	case VariableType.Float:
+					//		return BitConverter.Int32BitsToSingle((int)ret.Value);
+					//	case VariableType.Double:
+					//		return BitConverter.Int64BitsToDouble((long)ret.Value);
+					//	default:
+					//		throw new NotImplementedException();
+					//}
+					#endregion
 
 					default:
 						throw new UnsupportedInstructionException(opcode);
@@ -190,9 +264,10 @@ namespace microclr
 
 		public T Execute<T>() where T : unmanaged
 		{
-			Execute();
-			var ret = Stack.PopULong();
-			return MemoryMarshal.Cast<ulong, T>(MemoryMarshal.CreateSpan(ref ret, 1))[0];
+			return (T)Execute();
+			//Execute();
+			//var ret = Stack.PopULong();
+			//return MemoryMarshal.Cast<ulong, T>(MemoryMarshal.CreateSpan(ref ret, 1))[0];
 		}
 
 		internal string Disassemble()

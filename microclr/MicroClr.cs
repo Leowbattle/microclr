@@ -21,10 +21,10 @@ namespace microclr
 			return ctx.Execute<T>();
 		}
 
-		public void Execute(MethodInfo method)
+		public object Execute(MethodInfo method)
 		{
 			var ctx = new ExecutionContext(method, Stack);
-			ctx.Execute();
+			return ctx.Execute();
 		}
 
 		public string Disassemble(MethodInfo method)
