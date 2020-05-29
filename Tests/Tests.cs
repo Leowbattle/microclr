@@ -795,5 +795,33 @@ namespace Tests
 			RunTest(nameof(SimpleDivideDouble));
 		}
 		#endregion
+
+		#region Negation
+		static int NegateInt()
+		{
+			int a = 5;
+			return -a;
+		}
+
+		static float NegateFloat()
+		{
+			float f = 3;
+			return -f;
+		}
+
+		static double NegateDouble()
+		{
+			double d = 42;
+			return -d;
+		}
+
+		[TestMethod]
+		public void TestNegation()
+		{
+			RunTest(nameof(NegateInt));
+			RunTest(nameof(NegateFloat));
+			RunTest(nameof(NegateDouble));
+		}
+		#endregion
 	}
 }
