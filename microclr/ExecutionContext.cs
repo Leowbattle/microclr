@@ -15,12 +15,14 @@ namespace microclr
 
 		MicroClrStack Stack;
 
-		public ExecutionContext(MethodInfo method, object[] args, MicroClrStack stack)
+		public ExecutionContext(MethodInfo method, object[] args, MicroClrStack stack) : this(method, ConvertArgs(method, args), stack)
+		{
+		}
+
+		public ExecutionContext(MethodInfo method, Variable[] args, MicroClrStack stack)
 		{
 			this.method = method;
-			ValidateArgs(method, args);
-			this.args = ConvertArgs(method, args);
-
+			this.args = args;
 			Stack = stack;
 
 			il = method.GetMethodBody().GetILAsByteArray();
@@ -410,6 +412,21 @@ namespace microclr
 						break;
 					#endregion
 
+					#region Call
+					case OpCodeValues.Call:
+						var metadataToken = ReadInt();
+						var m = (MethodInfo)method.Module.ResolveMethod(metadataToken);
+						var nargs = m.GetParameters().Length;
+						var margs = new Variable[nargs];
+						for (int i = 0; i < nargs; i++)
+						{
+							margs[i] = Stack.Pop();
+						}
+						var ec = new ExecutionContext(m, margs, Stack);
+						ec.Execute();
+						break;
+					#endregion
+
 					#region Return
 					case OpCodeValues.Ret:
 						// I feel like there may be a better way to do this than
@@ -421,7 +438,7 @@ namespace microclr
 						}
 						else
 						{
-							var ret = Stack.Pop();
+							var ret = Stack.Peek();
 							if (retType == typeof(sbyte))
 							{
 								return (sbyte)ret.Value;

@@ -1728,5 +1728,40 @@ namespace Tests
 			RunTest(nameof(Switch2), 50);
 		}
 		#endregion
+
+		#region Call
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static void CallEmpty()
+		{
+			EmptyMethod();
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static int CallAdd(int a, int b)
+		{
+			return Add(a, b);
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static int RecursiveFibonacci(int n)
+		{
+			if (n < 2)
+			{
+				return n;
+			}
+			else
+			{
+				return RecursiveFibonacci(n - 1) + RecursiveFibonacci(n - 2);
+			}
+		}
+
+		[TestMethod]
+		public void TestCall()
+		{
+			RunTest(nameof(CallEmpty));
+			RunTest(nameof(CallAdd), 42, 100);
+			RunTest(nameof(RecursiveFibonacci), 10);
+		}
+		#endregion
 	}
 }

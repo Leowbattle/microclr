@@ -29,7 +29,7 @@ namespace microclr
 
 		public string Disassemble(MethodInfo method)
 		{
-			return new ExecutionContext(method, null, Stack).Disassemble();
+			return new ExecutionContext(method, (object[])null, Stack).Disassemble();
 		}
 	}
 }
