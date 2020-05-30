@@ -446,6 +446,131 @@ namespace microclr
 						break;
 					#endregion
 
+					#region Cast
+					case OpCodeValues.Conv_I:
+					case OpCodeValues.Conv_I4:
+						var v = Stack.Pop();
+						if (v.Type == VariableType.Float)
+						{
+							Stack.PushInt((int)BitConverter.Int32BitsToSingle((int)v.Value));
+						}
+						else if (v.Type == VariableType.Double)
+						{
+							Stack.PushInt((int)BitConverter.Int64BitsToDouble((long)v.Value));
+						}
+						else
+						{
+							Stack.PushInt((int)v.Value);
+						}
+						break;
+					case OpCodeValues.Conv_I1:
+						v = Stack.Pop();
+						if (v.Type == VariableType.Float)
+						{
+							Stack.PushInt((sbyte)BitConverter.Int32BitsToSingle((int)v.Value));
+						}
+						else if (v.Type == VariableType.Double)
+						{
+							Stack.PushInt((sbyte)BitConverter.Int64BitsToDouble((long)v.Value));
+						}
+						else
+						{
+							Stack.PushInt((sbyte)v.Value);
+						}
+						break;
+					case OpCodeValues.Conv_I2:
+						v = Stack.Pop();
+						if (v.Type == VariableType.Float)
+						{
+							Stack.PushInt((short)BitConverter.Int32BitsToSingle((int)v.Value));
+						}
+						else if (v.Type == VariableType.Double)
+						{
+							Stack.PushInt((short)BitConverter.Int64BitsToDouble((long)v.Value));
+						}
+						else
+						{
+							Stack.PushInt((short)v.Value);
+						}
+						break;
+					case OpCodeValues.Conv_I8:
+						v = Stack.Pop();
+						if (v.Type == VariableType.Float)
+						{
+							Stack.PushLong((long)BitConverter.Int32BitsToSingle((int)v.Value));
+						}
+						else if (v.Type == VariableType.Double)
+						{
+							Stack.PushLong((long)BitConverter.Int64BitsToDouble((long)v.Value));
+						}
+						else
+						{
+							Stack.PushLong((long)v.Value);
+						}
+						break;
+					case OpCodeValues.Conv_U:
+					case OpCodeValues.Conv_U4:
+						v = Stack.Pop();
+						if (v.Type == VariableType.Float)
+						{
+							Stack.PushULong((uint)BitConverter.Int32BitsToSingle((int)v.Value));
+						}
+						else if (v.Type == VariableType.Double)
+						{
+							Stack.PushULong((uint)BitConverter.Int64BitsToDouble((long)v.Value));
+						}
+						else
+						{
+							Stack.PushULong((uint)v.Value);
+						}
+						break;
+					case OpCodeValues.Conv_U1:
+						v = Stack.Pop();
+						if (v.Type == VariableType.Float)
+						{
+							Stack.PushULong((byte)BitConverter.Int32BitsToSingle((int)v.Value));
+						}
+						else if (v.Type == VariableType.Double)
+						{
+							Stack.PushULong((byte)BitConverter.Int64BitsToDouble((long)v.Value));
+						}
+						else
+						{
+							Stack.PushULong((byte)v.Value);
+						}
+						break;
+					case OpCodeValues.Conv_U2:
+						v = Stack.Pop();
+						if (v.Type == VariableType.Float)
+						{
+							Stack.PushULong((ushort)BitConverter.Int32BitsToSingle((int)v.Value));
+						}
+						else if (v.Type == VariableType.Double)
+						{
+							Stack.PushULong((ushort)BitConverter.Int64BitsToDouble((long)v.Value));
+						}
+						else
+						{
+							Stack.PushULong((ushort)v.Value);
+						}
+						break;
+					case OpCodeValues.Conv_U8:
+						v = Stack.Pop();
+						if (v.Type == VariableType.Float)
+						{
+							Stack.PushULong((ulong)BitConverter.Int32BitsToSingle((int)v.Value));
+						}
+						else if (v.Type == VariableType.Double)
+						{
+							Stack.PushULong((ulong)BitConverter.Int64BitsToDouble((long)v.Value));
+						}
+						else
+						{
+							Stack.PushULong((ulong)v.Value);
+						}
+						break;
+					#endregion
+
 					#region Switch
 					case OpCodeValues.Switch:
 						int n = ReadInt();

@@ -1935,5 +1935,281 @@ namespace Tests
 			RunTest(nameof(Pop));
 		}
 		#endregion
+
+		#region Cast
+		static int CastToInt(long l)
+		{
+			return (int)l; 
+		}
+
+		static int CastFloatToInt(float f)
+		{
+			return (int)f;
+		}
+
+		static int CastDoubleToInt(double d)
+		{
+			return (int)d;
+		}
+
+		[TestMethod]
+		public void TestCastToInt()
+		{
+			RunTest(nameof(CastToInt), 0l);
+			RunTest(nameof(CastToInt), (long)int.MaxValue + 1);
+
+			RunTest(nameof(CastFloatToInt), 1f);
+			RunTest(nameof(CastFloatToInt), -0f);
+			RunTest(nameof(CastFloatToInt), 0.5f);
+			RunTest(nameof(CastFloatToInt), float.PositiveInfinity);
+			RunTest(nameof(CastFloatToInt), float.NaN);
+
+			RunTest(nameof(CastDoubleToInt), 1d);
+			RunTest(nameof(CastDoubleToInt), -0d);
+			RunTest(nameof(CastDoubleToInt), 0.5);
+			RunTest(nameof(CastDoubleToInt), double.PositiveInfinity);
+			RunTest(nameof(CastDoubleToInt), double.NaN);
+		}
+
+		static sbyte CastToInt8(long l)
+		{
+			return (sbyte)l;
+		}
+
+		static sbyte CastFloatToInt8(float f)
+		{
+			return (sbyte)f;
+		}
+
+		static sbyte CastDoubleToInt8(double d)
+		{
+			return (sbyte)d;
+		}
+
+		[TestMethod]
+		public void TestCastToInt8()
+		{
+			RunTest(nameof(CastToInt8), 0l);
+			RunTest(nameof(CastToInt8), (long)sbyte.MaxValue + 1);
+
+			RunTest(nameof(CastFloatToInt8), 1f);
+			RunTest(nameof(CastFloatToInt8), -0f);
+			RunTest(nameof(CastFloatToInt8), 0.5f);
+			RunTest(nameof(CastFloatToInt8), float.PositiveInfinity);
+			RunTest(nameof(CastFloatToInt8), float.NaN);
+
+			RunTest(nameof(CastDoubleToInt8), 1d);
+			RunTest(nameof(CastDoubleToInt8), -0d);
+			RunTest(nameof(CastDoubleToInt8), 0.5);
+			RunTest(nameof(CastDoubleToInt8), double.PositiveInfinity);
+			RunTest(nameof(CastDoubleToInt8), double.NaN);
+		}
+
+		static short CastToInt16(long l)
+		{
+			return (short)l;
+		}
+
+		static short CastFloatToInt16(float f)
+		{
+			return (short)f;
+		}
+
+		static short CastDoubleToInt16(double d)
+		{
+			return (short)d;
+		}
+
+		[TestMethod]
+		public void TestCastToInt16()
+		{
+			RunTest(nameof(CastToInt16), 0l);
+			RunTest(nameof(CastToInt16), (long)int.MaxValue + 1);
+			RunTest(nameof(CastToInt16), (long)short.MaxValue + 1);
+
+			RunTest(nameof(CastFloatToInt16), 1f);
+			RunTest(nameof(CastFloatToInt16), -0f);
+			RunTest(nameof(CastFloatToInt16), 0.5f);
+			RunTest(nameof(CastFloatToInt16), float.PositiveInfinity);
+			RunTest(nameof(CastFloatToInt16), float.NaN);
+
+			RunTest(nameof(CastDoubleToInt16), 1d);
+			RunTest(nameof(CastDoubleToInt16), -0d);
+			RunTest(nameof(CastDoubleToInt16), 0.5);
+			RunTest(nameof(CastDoubleToInt16), double.PositiveInfinity);
+			RunTest(nameof(CastDoubleToInt16), double.NaN);
+		}
+
+		static long CastToInt64(long l)
+		{
+			return (long)l;
+		}
+
+		static long CastFloatToInt64(float f)
+		{
+			return (long)f;
+		}
+
+		static long CastDoubleToInt64(double d)
+		{
+			return (long)d;
+		}
+
+		[TestMethod]
+		public void TestCastToInt64()
+		{
+			RunTest(nameof(CastToInt64), 0l);
+			RunTest(nameof(CastToInt64), unchecked(long.MaxValue + 1));
+
+			RunTest(nameof(CastFloatToInt64), 1f);
+			RunTest(nameof(CastFloatToInt64), -0f);
+			RunTest(nameof(CastFloatToInt64), 0.5f);
+			RunTest(nameof(CastFloatToInt64), float.PositiveInfinity);
+			RunTest(nameof(CastFloatToInt64), float.NaN);
+
+			RunTest(nameof(CastDoubleToInt64), 1d);
+			RunTest(nameof(CastDoubleToInt64), -0d);
+			RunTest(nameof(CastDoubleToInt64), 0.5);
+			RunTest(nameof(CastDoubleToInt64), double.PositiveInfinity);
+			RunTest(nameof(CastDoubleToInt64), double.NaN);
+		}
+
+		static uint CastToUInt(ulong l)
+		{
+			return (uint)l;
+		}
+
+		static uint CastFloatToUInt(float f)
+		{
+			return (uint)f;
+		}
+
+		static uint CastDoubleToUInt(double d)
+		{
+			return (uint)d;
+		}
+
+		[TestMethod]
+		public void TestCastToUInt()
+		{
+			RunTest(nameof(CastToUInt), 0ul);
+			RunTest(nameof(CastToUInt), (ulong)uint.MaxValue + 1);
+
+			RunTest(nameof(CastFloatToUInt), 1f);
+			RunTest(nameof(CastFloatToUInt), -0f);
+			RunTest(nameof(CastFloatToUInt), 0.5f);
+			RunTest(nameof(CastFloatToUInt), float.PositiveInfinity);
+			RunTest(nameof(CastFloatToUInt), float.NaN);
+
+			RunTest(nameof(CastDoubleToUInt), 1d);
+			RunTest(nameof(CastDoubleToUInt), -0d);
+			RunTest(nameof(CastDoubleToUInt), 0.5);
+			RunTest(nameof(CastDoubleToUInt), double.PositiveInfinity);
+			RunTest(nameof(CastDoubleToUInt), double.NaN);
+		}
+
+		static byte CastToUInt8(ulong l)
+		{
+			return (byte)l;
+		}
+
+		static byte CastFloatToUInt8(float f)
+		{
+			return (byte)f;
+		}
+
+		static byte CastDoubleToUInt8(double d)
+		{
+			return (byte)d;
+		}
+
+		[TestMethod]
+		public void TestCastToUInt8()
+		{
+			RunTest(nameof(CastToUInt8), 0ul);
+			RunTest(nameof(CastToUInt8), (ulong)byte.MaxValue + 1);
+
+			RunTest(nameof(CastFloatToUInt8), 1f);
+			RunTest(nameof(CastFloatToUInt8), -0f);
+			RunTest(nameof(CastFloatToUInt8), 0.5f);
+			RunTest(nameof(CastFloatToUInt8), float.PositiveInfinity);
+			RunTest(nameof(CastFloatToUInt8), float.NaN);
+
+			RunTest(nameof(CastDoubleToUInt8), 1d);
+			RunTest(nameof(CastDoubleToUInt8), -0d);
+			RunTest(nameof(CastDoubleToUInt8), 0.5);
+			RunTest(nameof(CastDoubleToUInt8), double.PositiveInfinity);
+			RunTest(nameof(CastDoubleToUInt8), double.NaN);
+		}
+
+		static ushort CastToUInt16(ulong l)
+		{
+			return (ushort)l;
+		}
+
+		static ushort CastFloatToUInt16(float f)
+		{
+			return (ushort)f;
+		}
+
+		static ushort CastDoubleToUInt16(double d)
+		{
+			return (ushort)d;
+		}
+
+		[TestMethod]
+		public void TestCastToUInt16()
+		{
+			RunTest(nameof(CastToUInt16), 0ul);
+			RunTest(nameof(CastToUInt16), (ulong)uint.MaxValue + 1);
+			RunTest(nameof(CastToUInt16), (ulong)ushort.MaxValue + 1);
+
+			RunTest(nameof(CastFloatToUInt16), 1f);
+			RunTest(nameof(CastFloatToUInt16), -0f);
+			RunTest(nameof(CastFloatToUInt16), 0.5f);
+			RunTest(nameof(CastFloatToUInt16), float.PositiveInfinity);
+			RunTest(nameof(CastFloatToUInt16), float.NaN);
+
+			RunTest(nameof(CastDoubleToUInt16), 1d);
+			RunTest(nameof(CastDoubleToUInt16), -0d);
+			RunTest(nameof(CastDoubleToUInt16), 0.5);
+			RunTest(nameof(CastDoubleToUInt16), double.PositiveInfinity);
+			RunTest(nameof(CastDoubleToUInt16), double.NaN);
+		}
+
+		static ulong CastToUInt64(ulong l)
+		{
+			return (ulong)l;
+		}
+
+		static ulong CastFloatToUInt64(float f)
+		{
+			return (ulong)f;
+		}
+
+		static ulong CastDoubleToUInt64(double d)
+		{
+			return (ulong)d;
+		}
+
+		[TestMethod]
+		public void TestCastToUInt64()
+		{
+			RunTest(nameof(CastToUInt64), 0ul);
+			RunTest(nameof(CastToUInt64), unchecked(ulong.MaxValue + 1));
+
+			RunTest(nameof(CastFloatToUInt64), 1f);
+			RunTest(nameof(CastFloatToUInt64), -0f);
+			RunTest(nameof(CastFloatToUInt64), 0.5f);
+			RunTest(nameof(CastFloatToUInt64), float.PositiveInfinity);
+			RunTest(nameof(CastFloatToUInt64), float.NaN);
+
+			RunTest(nameof(CastDoubleToUInt64), 1d);
+			RunTest(nameof(CastDoubleToUInt64), -0d);
+			RunTest(nameof(CastDoubleToUInt64), 0.5);
+			RunTest(nameof(CastDoubleToUInt64), double.PositiveInfinity);
+			RunTest(nameof(CastDoubleToUInt64), double.NaN);
+		}
+		#endregion
 	}
 }
