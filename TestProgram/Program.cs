@@ -1,22 +1,31 @@
 ﻿using microclr;
 using System;
-using System.Reflection;
 
 namespace TestProgram
 {
 	class Program
 	{
-		public static int Read()
+		public static void DoFibonacci(int n)
 		{
-			return Console.Read();
+			int a = 0;
+			int b = 1;
+			int c = 1;
+
+			for (int i = 0; i < n; i++)
+			{
+				Console.WriteLine($"Fibonacci {i + 1} = {c}");
+				c = a + b;
+				a = b;
+				b = c;
+			}
 		}
 
 		static void Main(string[] args)
 		{
 			var clr = new MicroClr();
 
-			var method = typeof(Program).GetMethod(nameof(Read));
-			var ret = clr.Execute<int>(method);
+			var method = typeof(Program).GetMethod(nameof(DoFibonacci));
+			var ret = clr.Execute(method, 10);
 			Console.WriteLine(ret);
 		}
 	}

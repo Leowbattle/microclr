@@ -13,13 +13,15 @@ namespace microclr
 		byte[] il;
 		int ip;
 
+		MicroClr VM;
 		MicroClrStack Stack;
+		MicroClrHeap Heap;
 
-		public ExecutionContext(MethodInfo method, object[] args, MicroClrStack stack) : this(method, ConvertArgs(method, args), stack)
+		public ExecutionContext(MethodInfo method, object[] args, MicroClr vm) : this(method, ConvertArgs(vm, method, args), vm)
 		{
 		}
 
-		public ExecutionContext(MethodInfo method, Variable[] args, MicroClrStack stack)
+		public ExecutionContext(MethodInfo method, Variable[] args, MicroClr vm)
 		{
 			if (!method.IsStatic)
 			{
@@ -28,13 +30,15 @@ namespace microclr
 
 			this.method = method;
 			this.args = args;
-			Stack = stack;
+			VM = vm;
+			Stack = vm.Stack;
+			Heap = vm.Heap;
 
 			il = method.GetMethodBody().GetILAsByteArray();
 			ip = 0;
 		}
 
-		private static Variable[] ConvertArgs(MethodInfo method, object[] args)
+		private static Variable[] ConvertArgs(MicroClr vm, MethodInfo method, object[] args)
 		{
 			if (method.GetParameters().Length != args.Length)
 			{
@@ -97,6 +101,10 @@ namespace microclr
 				else if (argT == typeof(bool))
 				{
 					ret[i] = new Variable((bool)args[i] ? 1 : 0);
+				}
+				else if (!argT.IsValueType)
+				{
+					ret[i] = new Variable((ulong)vm.Heap.Add(args[i]));
 				}
 				else
 				{
@@ -206,7 +214,8 @@ namespace microclr
 
 					#region Push literal to the stack
 					case OpCodeValues.Ldnull:
-						Stack.PushULong(0);
+						//Stack.PushULong(0);
+						Stack.Push(new Variable((ulong)Heap.Add(null), VariableType.Object));
 						break;
 					case OpCodeValues.Ldc_I4:
 						Stack.PushInt(ReadInt());
@@ -417,6 +426,71 @@ namespace microclr
 						break;
 					#endregion
 
+					#region Load string
+					case OpCodeValues.Ldstr:
+						var strToken = ReadInt();
+						var str = method.Module.ResolveString(strToken);
+						Stack.PushObject(Heap.Add(str));
+						break;
+					#endregion
+
+					#region Box
+					case OpCodeValues.Box:
+						var boxType = method.Module.ResolveType(ReadInt());
+						var val = Stack.Pop().Value;
+						object o;
+						if (boxType == typeof(sbyte))
+						{
+							o = (sbyte)val;
+						}
+						else if (boxType == typeof(byte))
+						{
+							o = (byte)val;
+						}
+						else if (boxType == typeof(short))
+						{
+							o = (short)val;
+						}
+						else if (boxType == typeof(ushort))
+						{
+							o = (ushort)val;
+						}
+						else if (boxType == typeof(int))
+						{
+							o = (int)val;
+						}
+						else if (boxType == typeof(uint))
+						{
+							o = (uint)val;
+						}
+						else if (boxType == typeof(long))
+						{
+							o = (long)val;
+						}
+						else if (boxType == typeof(ulong))
+						{
+							o = (ulong)val;
+						}
+						else if (boxType == typeof(float))
+						{
+							o = BitConverter.Int32BitsToSingle((int)val);
+						}
+						else if (boxType == typeof(double))
+						{
+							o = BitConverter.Int64BitsToDouble((long)val);
+						}
+						else if (boxType == typeof(bool))
+						{
+							o = val == 1 ? true : false;
+						}
+						else
+						{
+							throw new NotSupportedException();
+						}
+						Stack.Push(new Variable((ulong)Heap.Add(o), VariableType.Object));
+						break;
+					#endregion
+
 					#region Call
 					case OpCodeValues.Call:
 						var metadataToken = ReadInt();
@@ -432,14 +506,14 @@ namespace microclr
 							{
 								margs[i] = Stack.Pop();
 							}
-							var ec = new ExecutionContext(m, margs, Stack);
+							var ec = new ExecutionContext(m, margs, VM);
 							ec.Execute();
 						}
 						else
 						{
 							var p = m.GetParameters();
 							var args = new object[p.Length];
-							for (int i = 0; i < args.Length; i++)
+							for (int i = args.Length - 1; i >= 0; i--)
 							{
 								var arg = Stack.Pop();
 								var argT = p[i].ParameterType;
@@ -486,6 +560,10 @@ namespace microclr
 								else if (argT == typeof(bool))
 								{
 									args[i] = arg.Value == 1 ? true : false;
+								}
+								else if (!argT.IsValueType)
+								{
+									args[i] = Heap.Objects[(int)arg.Value];
 								}
 								else
 								{
@@ -539,6 +617,10 @@ namespace microclr
 								else if (retT == typeof(bool))
 								{
 									Stack.Push(new Variable((bool)ret ? 1 : 0));
+								}
+								else if (!retT.IsValueType)
+								{
+									Stack.Push(new Variable((ulong)Heap.Add(ret), VariableType.Object));
 								}
 								else
 								{
@@ -605,25 +687,15 @@ namespace microclr
 							{
 								return ret.Value != 0;
 							}
+							else if (!retType.IsValueType)
+							{
+								return Heap.Objects[(int)ret.Value];
+							}
 							else
 							{
 								throw new NotImplementedException();
 							}
 						}
-					//var ret = Stack.Pop();
-					//switch (ret.Type)
-					//{
-					//	case VariableType.Int:
-					//		return (long)ret.Value;
-					//	case VariableType.UInt:
-					//		return ret.Value;
-					//	case VariableType.Float:
-					//		return BitConverter.Int32BitsToSingle((int)ret.Value);
-					//	case VariableType.Double:
-					//		return BitConverter.Int64BitsToDouble((long)ret.Value);
-					//	default:
-					//		throw new NotImplementedException();
-					//}
 					#endregion
 
 					default:
@@ -632,7 +704,7 @@ namespace microclr
 			}
 		}
 
-		public T Execute<T>() where T : unmanaged
+		public T Execute<T>()
 		{
 			return (T)Execute();
 		}

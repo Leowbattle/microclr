@@ -9,7 +9,8 @@ namespace microclr
 		Int,
 		UInt,
 		Float,
-		Double
+		Double,
+		Object
 	}
 
 	public struct Variable

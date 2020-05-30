@@ -71,5 +71,10 @@ namespace microclr
 		{
 			return BitConverter.Int64BitsToDouble((long)Stack[--StackPointer].Value);
 		}
+
+		public void PushObject(int o)
+		{
+			Stack[StackPointer++] = new Variable((ulong)o, VariableType.Object);
+		}
 	}
 }
