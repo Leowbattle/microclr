@@ -1660,6 +1660,16 @@ namespace Tests
 			return x == y;
 		}
 
+		static bool IsGreater(int x, int y)
+		{
+			return x > y;
+		}
+
+		static bool IsLess(int x, int y)
+		{
+			return x < y;
+		}
+
 		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static int Fibonacci(int n)
 		{
@@ -1682,6 +1692,8 @@ namespace Tests
 		{
 			RunTest(nameof(AreEqual), 5, 5);
 			RunTest(nameof(AreEqual), 5, 4);
+			RunTest(nameof(IsGreater), 4, 2);
+			RunTest(nameof(IsLess), 4, 2);
 			RunTest(nameof(Fibonacci), 10);
 		}
 		#endregion
@@ -1794,6 +1806,20 @@ namespace Tests
 			RunTest(nameof(BoxInt), 42);
 			RunTest(nameof(ReturnString));
 			RunTest(nameof(StringFormat), 100);
+		}
+		#endregion
+
+		#region Pop
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static void Pop()
+		{
+			ReturnSmallInt();
+		}
+
+		[TestMethod]
+		public void TestPop()
+		{
+			RunTest(nameof(Pop));
 		}
 		#endregion
 	}

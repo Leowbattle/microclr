@@ -145,9 +145,15 @@ namespace microclr
 
 				switch (opcode)
 				{
+					#region Miscellaneous
 					// Do nothing
 					case OpCodeValues.Nop:
 						break;
+
+					case OpCodeValues.Pop:
+						Stack.Pop();
+						break;
+					#endregion
 
 					#region Argument loading
 					case OpCodeValues.Ldarg:
