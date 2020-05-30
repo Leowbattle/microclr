@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -16,6 +17,8 @@ namespace microclr
 		MicroClr VM;
 		MicroClrStack Stack;
 		MicroClrHeap Heap;
+
+		private static readonly MethodInfo initArray = typeof(RuntimeHelpers).GetMethod("InitializeArray");
 
 		public ExecutionContext(MethodInfo method, object[] args, MicroClr vm) : this(method, ConvertArgs(vm, method, args), vm)
 		{
@@ -152,6 +155,14 @@ namespace microclr
 
 					case OpCodeValues.Pop:
 						Stack.Pop();
+						break;
+
+					case OpCodeValues.Dup:
+						Stack.Push(Stack.Peek());
+						break;
+
+					case OpCodeValues.Ldtoken:
+						Stack.PushInt(ReadInt());
 						break;
 					#endregion
 
@@ -784,6 +795,15 @@ namespace microclr
 						break;
 					#endregion
 
+					#region Arrays
+					case OpCodeValues.Newarr:
+						var etype = method.Module.ResolveType(ReadInt());
+						var length = Stack.PopInt();
+						var array = new MicroClrArray(etype, length);
+						Stack.Push(new Variable((ulong)Heap.Add(array), VariableType.Object));
+						break;
+					#endregion
+
 					#region Is instance
 					case OpCodeValues.Isinst:
 						var obj = Heap[Stack.PopInt()];
@@ -847,6 +867,11 @@ namespace microclr
 					case OpCodeValues.Call:
 						var metadataToken = ReadInt();
 						var m = (MethodInfo)method.Module.ResolveMethod(metadataToken);
+						if (m == initArray)
+						{
+							InitArray();
+							break;
+						}
 
 						// I'm not writing a whole CLR, so if the method is in a different module
 						// let the real CLR execute it.
@@ -1041,7 +1066,15 @@ namespace microclr
 							}
 							else if (!retType.IsValueType)
 							{
-								return Heap[(int)ret.Value];
+								var retObj = Heap[(int)ret.Value];
+								if (retObj is MicroClrArray ma)
+								{
+									return ma.Items;
+								}
+								else
+								{
+									return retObj;
+								}
 							}
 							else
 							{
@@ -1054,6 +1087,70 @@ namespace microclr
 						throw new UnsupportedInstructionException(opcode);
 				}
 			}
+		}
+
+		private void InitArray()
+		{
+			var initData = method.Module.ResolveField(Stack.PopInt()).GetValue(null);
+			var gch = GCHandle.Alloc(initData, GCHandleType.Pinned);
+			var addr = gch.AddrOfPinnedObject();
+			ReadOnlySpan<byte> data;
+			unsafe
+			{
+				data = new ReadOnlySpan<byte>(addr.ToPointer(), Marshal.SizeOf(initData.GetType()));
+			}
+			var arr = ((MicroClrArray)Heap[Stack.PopInt()]).Items;
+			Span<byte> arrData;
+			if (arr is sbyte[] sb)
+			{
+				arrData = MemoryMarshal.AsBytes<sbyte>(sb);
+			}
+			else if (arr is byte[] b)
+			{
+				arrData = b;
+			}
+			else if (arr is short[] s)
+			{
+				arrData = MemoryMarshal.AsBytes<short>(s);
+			}
+			else if (arr is ushort[] us)
+			{
+				arrData = MemoryMarshal.AsBytes<ushort>(us);
+			}
+			else if (arr is int[] i)
+			{
+				arrData = MemoryMarshal.AsBytes<int>(i);
+			}
+			else if (arr is uint[] ui)
+			{
+				arrData = MemoryMarshal.AsBytes<uint>(ui);
+			}
+			else if (arr is long[] l)
+			{
+				arrData = MemoryMarshal.AsBytes<long>(l);
+			}
+			else if (arr is ulong[] ul)
+			{
+				arrData = MemoryMarshal.AsBytes<ulong>(ul);
+			}
+			else if (arr is float[] f)
+			{
+				arrData = MemoryMarshal.AsBytes<float>(f);
+			}
+			else if (arr is double[] d)
+			{
+				arrData = MemoryMarshal.AsBytes<double>(d);
+			}
+			else if (arr is bool[] bo)
+			{
+				arrData = MemoryMarshal.AsBytes<bool>(bo);
+			}
+			else
+			{
+				throw new NotSupportedException();
+			}
+			data.CopyTo(arrData);
+			gch.Free();
 		}
 
 		public T Execute<T>()

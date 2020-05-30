@@ -1,6 +1,7 @@
 ﻿using microclr;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -35,6 +36,31 @@ namespace Tests
 			var method = typeof(Tests).GetMethod(name, BindingFlags.NonPublic | BindingFlags.Static);
 			var dotnet = method.Invoke(null, args);
 			var microclr = new MicroClr().Execute(method, args);
+			if (method.ReturnType.IsArray)
+			{
+				if (dotnet == null && microclr == null)
+				{
+					return;
+				}
+
+				var ad = (Array)dotnet;
+				var am = (Array)microclr;
+				if (ad.Length != am.Length)
+				{
+					Assert.Fail();
+				}
+				for (int i = 0; i < ad.Length; i++)
+				{
+					var ditem = ad.GetValue(i);
+					var mitem = am.GetValue(i);
+					if (ditem == null && mitem == null || ditem.Equals(mitem))
+					{
+						continue;
+					}
+					Assert.Fail();
+				}
+				return;
+			}
 			Assert.AreEqual(dotnet, microclr);
 		}
 		#endregion
@@ -1990,7 +2016,7 @@ namespace Tests
 		#region Cast
 		static int CastToInt(long l)
 		{
-			return (int)l; 
+			return (int)l;
 		}
 
 		static int CastFloatToInt(float f)
@@ -2319,7 +2345,7 @@ namespace Tests
 			RunTest(nameof(CastToDouble), int.MaxValue);
 
 			RunTest(nameof(CastUIntToDouble), 0u);
-			RunTest(nameof(CastUIntToDouble), (uint)int.MaxValue+10);
+			RunTest(nameof(CastUIntToDouble), (uint)int.MaxValue + 10);
 			RunTest(nameof(CastUIntToDouble), uint.MaxValue);
 
 			RunTest(nameof(CastFloatToDouble), 0f);
@@ -2353,5 +2379,21 @@ namespace Tests
 			Run(nameof(InvalidCast));
 		}
 		#endregion
+
+		#region Arrays
+		static int[] CreateIntArray()
+		{
+			int[] arr = { 1, 2, 3, 4, 5 };
+			return arr;
+		}
+
+		[TestMethod]
+		public void TestArrays()
+		{
+			RunTest(nameof(CreateIntArray));
+		}
+		#endregion
+
+		// TODO Support generics through MethodInfo.MakeGenericMethod
 	}
 }

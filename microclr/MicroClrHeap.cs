@@ -21,4 +21,14 @@ namespace microclr
 			get => Objects[index - 1];
 		}
 	}
+
+	class MicroClrArray
+	{
+		internal Array Items;
+
+		public MicroClrArray(Type type, int length)
+		{
+			Items = Array.CreateInstance(type, length);
+		}
+	}
 }
