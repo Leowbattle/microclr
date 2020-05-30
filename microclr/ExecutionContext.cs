@@ -799,8 +799,26 @@ namespace microclr
 					case OpCodeValues.Newarr:
 						var etype = method.Module.ResolveType(ReadInt());
 						var length = Stack.PopInt();
-						var array = new MicroClrArray(etype, length);
+						var array = Array.CreateInstance(etype, length);
 						Stack.Push(new Variable((ulong)Heap.Add(array), VariableType.Object));
+						break;
+					case OpCodeValues.Ldelem_I:
+					case OpCodeValues.Ldelem_I4:
+						var index = Stack.PopInt();
+						var arr = (int[])Heap[Stack.PopInt()];
+						Stack.PushInt(arr[index]);
+						break;
+
+					case OpCodeValues.Ldelem_Ref:
+						index = Stack.PopInt();
+						var oarr = (object[])Heap[Stack.PopInt()];
+						Stack.Push(new Variable((ulong)Heap.Add(oarr[index]), VariableType.Object));
+						break;
+					case OpCodeValues.Stelem_Ref:
+						var refVal = Heap[Stack.PopInt()];
+						index = Stack.PopInt();
+						oarr = (object[])Heap[Stack.PopInt()];
+						oarr[index] = refVal;
 						break;
 					#endregion
 
@@ -1066,15 +1084,7 @@ namespace microclr
 							}
 							else if (!retType.IsValueType)
 							{
-								var retObj = Heap[(int)ret.Value];
-								if (retObj is MicroClrArray ma)
-								{
-									return ma.Items;
-								}
-								else
-								{
-									return retObj;
-								}
+								return Heap[(int)ret.Value];
 							}
 							else
 							{
@@ -1099,7 +1109,7 @@ namespace microclr
 			{
 				data = new ReadOnlySpan<byte>(addr.ToPointer(), Marshal.SizeOf(initData.GetType()));
 			}
-			var arr = ((MicroClrArray)Heap[Stack.PopInt()]).Items;
+			var arr = Heap[Stack.PopInt()];
 			Span<byte> arrData;
 			if (arr is sbyte[] sb)
 			{

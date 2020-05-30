@@ -2387,10 +2387,30 @@ namespace Tests
 			return arr;
 		}
 
+		static int IndexIntArray(int i)
+		{
+			int[] arr = { 1, 2, 3, 4, 5 };
+			return arr[i];
+		}
+
+		static string IndexStringArray(int i)
+		{
+			string[] strings = { "Hello", "There", "General", "Kenobi" };
+			return strings[i];
+		}
+
 		[TestMethod]
 		public void TestArrays()
 		{
 			RunTest(nameof(CreateIntArray));
+			RunTest(nameof(IndexIntArray), 0);
+			RunTest(nameof(IndexIntArray), 1);
+			RunTest(nameof(IndexIntArray), 2);
+
+			RunTest(nameof(IndexStringArray), 0);
+			RunTest(nameof(IndexStringArray), 1);
+			RunTest(nameof(IndexStringArray), 2);
+			RunTest(nameof(IndexStringArray), 3);
 		}
 		#endregion
 
