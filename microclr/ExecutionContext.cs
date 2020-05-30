@@ -569,6 +569,67 @@ namespace microclr
 							Stack.PushULong((ulong)v.Value);
 						}
 						break;
+
+					case OpCodeValues.Conv_R_Un:
+						// There is no Conv_R8_Un instruction, so the compiler generates Conv_R_Un
+						// and Conv_R8 to convert from unsigned int to double, which loses precision.
+						// To get around this issue we detect a cast from uint to double by checking
+						// if the next instruction after a Conv_R_Un is Conv_R8 and then skip the
+						// cast to float.
+						if ((OpCodeValues)il[ip] == OpCodeValues.Conv_R8)
+						{
+							goto case OpCodeValues.Conv_R8;
+						}
+						else
+						{
+							goto case OpCodeValues.Conv_R4;
+						}
+					case OpCodeValues.Conv_R4:
+						v = Stack.Pop();
+						if (v.Type == VariableType.Int)
+						{
+							Stack.PushFloat((float)(long)v.Value);
+						}
+						else if (v.Type == VariableType.UInt)
+						{
+							Stack.PushFloat((float)v.Value);
+						}
+						else if (v.Type == VariableType.Float)
+						{
+							Stack.Push(v);
+						}
+						else if (v.Type == VariableType.Double)
+						{
+							Stack.PushFloat((float)BitConverter.Int64BitsToDouble((long)v.Value));
+						}
+						else
+						{
+							throw new NotSupportedException();
+						}
+						break;
+					case OpCodeValues.Conv_R8:
+						v = Stack.Pop();
+						if (v.Type == VariableType.Int)
+						{
+							Stack.PushDouble((double)(long)v.Value);
+						}
+						else if (v.Type == VariableType.UInt)
+						{
+							Stack.PushDouble((double)v.Value);
+						}
+						else if (v.Type == VariableType.Float)
+						{
+							Stack.PushDouble((double)BitConverter.Int32BitsToSingle((int)v.Value));
+						}
+						else if (v.Type == VariableType.Double)
+						{
+							Stack.Push(v);
+						}
+						else
+						{
+							throw new NotSupportedException();
+						}
+						break;
 					#endregion
 
 					#region Switch

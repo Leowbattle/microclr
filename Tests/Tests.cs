@@ -2210,6 +2210,73 @@ namespace Tests
 			RunTest(nameof(CastDoubleToUInt64), double.PositiveInfinity);
 			RunTest(nameof(CastDoubleToUInt64), double.NaN);
 		}
+
+		static float CastToFloat(int i)
+		{
+			return (float)i;
+		}
+
+		static float CastUIntToFloat(uint i)
+		{
+			return (float)i;
+		}
+
+		static float CastDoubleToFloat(double d)
+		{
+			return (float)d;
+		}
+
+		[TestMethod]
+		public void TestCastToFloat()
+		{
+			RunTest(nameof(CastToFloat), 0);
+			RunTest(nameof(CastToFloat), -1);
+			RunTest(nameof(CastToFloat), int.MaxValue);
+
+			RunTest(nameof(CastUIntToFloat), 0u);
+			RunTest(nameof(CastUIntToFloat), uint.MaxValue);
+
+			RunTest(nameof(CastDoubleToFloat), 0d);
+			RunTest(nameof(CastDoubleToFloat), Math.PI);
+			RunTest(nameof(CastDoubleToFloat), double.PositiveInfinity);
+			RunTest(nameof(CastDoubleToFloat), double.NaN);
+			RunTest(nameof(CastDoubleToFloat), double.MaxValue);
+		}
+
+
+
+		static double CastToDouble(int i)
+		{
+			return (float)i;
+		}
+
+		static double CastUIntToDouble(uint i)
+		{
+			return (double)i;
+		}
+
+		static double CastFloatToDouble(float f)
+		{
+			return (double)f;
+		}
+
+		[TestMethod]
+		public void TestCastToDouble()
+		{
+			RunTest(nameof(CastToDouble), 0);
+			RunTest(nameof(CastToDouble), -1);
+			RunTest(nameof(CastToDouble), int.MaxValue);
+
+			RunTest(nameof(CastUIntToDouble), 0u);
+			RunTest(nameof(CastUIntToDouble), (uint)int.MaxValue+10);
+			RunTest(nameof(CastUIntToDouble), uint.MaxValue);
+
+			RunTest(nameof(CastFloatToDouble), 0f);
+			RunTest(nameof(CastFloatToDouble), MathF.PI);
+			RunTest(nameof(CastFloatToDouble), float.PositiveInfinity);
+			RunTest(nameof(CastFloatToDouble), float.NaN);
+			RunTest(nameof(CastFloatToDouble), float.MaxValue);
+		}
 		#endregion
 	}
 }
