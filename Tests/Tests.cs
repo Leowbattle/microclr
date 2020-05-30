@@ -810,6 +810,20 @@ namespace Tests
 		}
 		#endregion
 
+		#region Remainder
+		static bool IsEven(int x)
+		{
+			return x % 2 == 0;
+		}
+
+		[TestMethod]
+		public void TestRemainder()
+		{
+			RunTest(nameof(IsEven), 2);
+			RunTest(nameof(IsEven), 3);
+		}
+		#endregion
+
 		#region Negation
 		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static int NegateInt()
@@ -838,6 +852,100 @@ namespace Tests
 			RunTest(nameof(NegateInt));
 			RunTest(nameof(NegateFloat));
 			RunTest(nameof(NegateDouble));
+		}
+		#endregion
+
+		#region Bitwise operators
+		static int Bitand(int a, int b)
+		{
+			return a & b;
+		}
+
+		static int Bitor(int a, int b)
+		{
+			return a | b;
+		}
+
+		static int Bitxor(int a, int b)
+		{
+			return a ^ b;
+		}
+
+		static int Bitnot(int a)
+		{
+			return ~a;
+		}
+
+		static int BitShiftLeft(int a, int b)
+		{
+			return a << b;
+		}
+
+		static int BitShiftRight(int a, int b)
+		{
+			return a >> b;
+		}
+
+		[TestMethod]
+		public void TestBitwiseOperators()
+		{
+			RunTest(nameof(Bitand), 0, 0);
+			RunTest(nameof(Bitand), 0, 1);
+			RunTest(nameof(Bitand), 52, 35);
+
+			RunTest(nameof(Bitor), 0, 0);
+			RunTest(nameof(Bitor), 0, 1);
+			RunTest(nameof(Bitor), 52, 35);
+
+			RunTest(nameof(Bitxor), 0, 0);
+			RunTest(nameof(Bitxor), 0, 1);
+			RunTest(nameof(Bitxor), 52, 35);
+
+			RunTest(nameof(Bitnot), 0);
+			RunTest(nameof(Bitnot), int.MaxValue);
+			RunTest(nameof(Bitnot), 55);
+
+			RunTest(nameof(BitShiftLeft), 0, 0);
+			RunTest(nameof(BitShiftLeft), 0, 1);
+			RunTest(nameof(BitShiftLeft), 52, 35);
+
+			RunTest(nameof(BitShiftRight), 0, 0);
+			RunTest(nameof(BitShiftRight), 0, 1);
+			RunTest(nameof(BitShiftRight), 52, 35);
+		}
+		#endregion
+
+		#region Logical operators
+		static bool LogicAnd(bool a, bool b)
+		{
+			return a && b;
+		}
+
+		static bool LogicOr(bool a, bool b)
+		{
+			return a || b;
+		}
+
+		static bool LogicNot(bool b)
+		{
+			return !b;
+		}
+
+		[TestMethod]
+		public void TestLogicalOperators()
+		{
+			RunTest(nameof(LogicAnd), false, false);
+			RunTest(nameof(LogicAnd), false, true);
+			RunTest(nameof(LogicAnd), true, false);
+			RunTest(nameof(LogicAnd), true, true);
+
+			RunTest(nameof(LogicOr), false, false);
+			RunTest(nameof(LogicOr), false, true);
+			RunTest(nameof(LogicOr), true, false);
+			RunTest(nameof(LogicOr), true, true);
+
+			RunTest(nameof(LogicNot), false);
+			RunTest(nameof(LogicNot), true);
 		}
 		#endregion
 
@@ -1660,11 +1768,13 @@ namespace Tests
 			return x == y;
 		}
 
+		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static bool IsGreater(int x, int y)
 		{
 			return x > y;
 		}
 
+		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static bool IsLess(int x, int y)
 		{
 			return x < y;
@@ -1785,16 +1895,19 @@ namespace Tests
 		#endregion
 
 		#region Heap
+		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static object BoxInt(int n)
 		{
 			return n;
 		}
 
+		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static string ReturnString()
 		{
 			return "hello";
 		}
 
+		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static string StringFormat(int x)
 		{
 			return $"x is {x}";

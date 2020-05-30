@@ -401,6 +401,11 @@ namespace microclr
 						var dividend = Stack.PopLong();
 						Stack.PushLong(dividend / divisor);
 						break;
+					case OpCodeValues.Rem:
+						divisor = Stack.PopLong();
+						dividend = Stack.PopLong();
+						Stack.PushLong(dividend % divisor);
+						break;
 					case OpCodeValues.Neg:
 						if (Stack.Peek().Type == VariableType.Float)
 						{
@@ -413,6 +418,31 @@ namespace microclr
 							break;
 						}
 						Stack.PushLong(-Stack.PopLong());
+						break;
+					#endregion
+
+					#region Bitwise operators
+					case OpCodeValues.And:
+						Stack.PushLong(Stack.PopLong() & Stack.PopLong());
+						break;
+					case OpCodeValues.Or:
+						Stack.PushLong(Stack.PopLong() | Stack.PopLong());
+						break;
+					case OpCodeValues.Xor:
+						Stack.PushLong(Stack.PopLong() ^ Stack.PopLong());
+						break;
+					case OpCodeValues.Not:
+						Stack.PushLong(~Stack.PopLong());
+						break;
+					case OpCodeValues.Shl:
+						int shift = Stack.PopInt();
+						long x = Stack.PopLong();
+						Stack.PushLong(x << shift);
+						break;
+					case OpCodeValues.Shr:
+						shift = Stack.PopInt();
+						x = Stack.PopLong();
+						Stack.PushLong(x >> shift);
 						break;
 					#endregion
 
