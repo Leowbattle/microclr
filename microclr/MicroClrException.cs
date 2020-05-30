@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 namespace microclr
@@ -18,6 +19,18 @@ namespace microclr
 		}
 
 		public override string Message => $"Unsupported CLR instruction {Instruction}";
+	}
+
+	public class NonStaticMethodException : MicroClrException
+	{
+		public MethodInfo Method { get; }
+
+		public NonStaticMethodException(MethodInfo method)
+		{
+			Method = method;
+		}
+
+		public override string Message => $"Tried to execute non-static method {Method}";
 	}
 
 	public class IncorrectReturnTypeException : MicroClrException

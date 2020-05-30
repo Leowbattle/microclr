@@ -60,6 +60,21 @@ namespace Tests
 		}
 		#endregion
 
+		#region Non-static method
+		[MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+		void InstanceMethod()
+		{
+
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(NonStaticMethodException))]
+		public void TestNonStaticMethodException()
+		{
+			new MicroClr().Execute(typeof(Tests).GetMethod(nameof(InstanceMethod), BindingFlags.NonPublic | BindingFlags.Instance));
+		}
+		#endregion
+
 		#region Local variables
 		/// <summary>
 		/// There are 256 local variables in this function, so it uses all of the local variable storing instructions

@@ -6,21 +6,17 @@ namespace TestProgram
 {
 	class Program
 	{
-		public double Method()
+		public static int Read()
 		{
-			double d = 3.14;
-			return d;
+			return Console.Read();
 		}
 
 		static void Main(string[] args)
 		{
 			var clr = new MicroClr();
 
-			var method = typeof(Program).GetMethod(nameof(Method));
-			//Console.WriteLine(clr.Disassemble(method));
-
-			//var method = typeof(Program).GetMethod(nameof(Main), BindingFlags.NonPublic | BindingFlags.Static);
-			var ret = clr.Execute<double>(method);
+			var method = typeof(Program).GetMethod(nameof(Read));
+			var ret = clr.Execute<int>(method);
 			Console.WriteLine(ret);
 		}
 	}

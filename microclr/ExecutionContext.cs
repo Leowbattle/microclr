@@ -21,6 +21,11 @@ namespace microclr
 
 		public ExecutionContext(MethodInfo method, Variable[] args, MicroClrStack stack)
 		{
+			if (!method.IsStatic)
+			{
+				throw new NonStaticMethodException(method);
+			}
+
 			this.method = method;
 			this.args = args;
 			Stack = stack;
@@ -416,14 +421,131 @@ namespace microclr
 					case OpCodeValues.Call:
 						var metadataToken = ReadInt();
 						var m = (MethodInfo)method.Module.ResolveMethod(metadataToken);
-						var nargs = m.GetParameters().Length;
-						var margs = new Variable[nargs];
-						for (int i = 0; i < nargs; i++)
+
+						// I'm not writing a whole CLR, so if the method is in a different module
+						// let the real CLR execute it.
+						if (m.Module == method.Module)
 						{
-							margs[i] = Stack.Pop();
+							var nargs = m.GetParameters().Length;
+							var margs = new Variable[nargs];
+							for (int i = 0; i < nargs; i++)
+							{
+								margs[i] = Stack.Pop();
+							}
+							var ec = new ExecutionContext(m, margs, Stack);
+							ec.Execute();
 						}
-						var ec = new ExecutionContext(m, margs, Stack);
-						ec.Execute();
+						else
+						{
+							var p = m.GetParameters();
+							var args = new object[p.Length];
+							for (int i = 0; i < args.Length; i++)
+							{
+								var arg = Stack.Pop();
+								var argT = p[i].ParameterType;
+								if (argT == typeof(sbyte))
+								{
+									args[i] = (sbyte)arg.Value;
+								}
+								else if (argT == typeof(byte))
+								{
+									args[i] = (byte)arg.Value;
+								}
+								else if (argT == typeof(short))
+								{
+									args[i] = (short)arg.Value;
+								}
+								else if (argT == typeof(ushort))
+								{
+									args[i] = (ushort)arg.Value;
+								}
+								else if (argT == typeof(int))
+								{
+									args[i] = (int)arg.Value;
+								}
+								else if (argT == typeof(uint))
+								{
+									args[i] = (uint)arg.Value;
+								}
+								else if (argT == typeof(long))
+								{
+									args[i] = (long)arg.Value;
+								}
+								else if (argT == typeof(ulong))
+								{
+									args[i] = arg.Value;
+								}
+								else if (argT == typeof(float))
+								{
+									args[i] = BitConverter.Int32BitsToSingle((int)arg.Value);
+								}
+								else if (argT == typeof(double))
+								{
+									args[i] = BitConverter.Int64BitsToDouble((long)arg.Value);
+								}
+								else if (argT == typeof(bool))
+								{
+									args[i] = arg.Value == 1 ? true : false;
+								}
+								else
+								{
+									throw new NotSupportedException();
+								}
+							}
+							var ret = m.Invoke(null, args);
+							var retT = m.ReturnType;
+							if (retT != typeof(void))
+							{
+								if (retT == typeof(sbyte))
+								{
+									Stack.Push(new Variable((sbyte)ret));
+								}
+								else if (retT == typeof(byte))
+								{
+									Stack.Push(new Variable((byte)ret));
+								}
+								else if (retT == typeof(short))
+								{
+									Stack.Push(new Variable((short)ret));
+								}
+								else if (retT == typeof(ushort))
+								{
+									Stack.Push(new Variable((ushort)ret));
+								}
+								else if (retT == typeof(int))
+								{
+									Stack.Push(new Variable((int)ret));
+								}
+								else if (retT == typeof(uint))
+								{
+									Stack.Push(new Variable((uint)ret));
+								}
+								else if (retT == typeof(long))
+								{
+									Stack.Push(new Variable((long)ret));
+								}
+								else if (retT == typeof(ulong))
+								{
+									Stack.Push(new Variable((ulong)ret));
+								}
+								else if (retT == typeof(float))
+								{
+									Stack.PushFloat((float)ret);
+								}
+								else if (retT == typeof(double))
+								{
+									Stack.PushDouble((double)ret);
+								}
+								else if (retT == typeof(bool))
+								{
+									Stack.Push(new Variable((bool)ret ? 1 : 0));
+								}
+								else
+								{
+									throw new NotSupportedException();
+								}
+							}
+						}
 						break;
 					#endregion
 
