@@ -37,13 +37,6 @@ namespace Tests
 			var microclr = new MicroClr().Execute(method, args);
 			Assert.AreEqual(dotnet, microclr);
 		}
-
-		static void RunTest(Delegate d, params object[] args)
-		{
-			var dotnet = d.DynamicInvoke(args);
-			var microclr = new MicroClr().Execute(d.Method, args);
-			Assert.AreEqual(dotnet, microclr);
-		}
 		#endregion
 
 		#region Empty method
@@ -1776,6 +1769,31 @@ namespace Tests
 			RunTest(nameof(CallEmpty));
 			RunTest(nameof(CallAdd), 42, 100);
 			RunTest(nameof(RecursiveFibonacci), 10);
+		}
+		#endregion
+
+		#region Heap
+		static object BoxInt(int n)
+		{
+			return n;
+		}
+
+		static string ReturnString()
+		{
+			return "hello";
+		}
+
+		static string StringFormat(int x)
+		{
+			return $"x is {x}";
+		}
+
+		[TestMethod]
+		public void TestHeap()
+		{
+			RunTest(nameof(BoxInt), 42);
+			RunTest(nameof(ReturnString));
+			RunTest(nameof(StringFormat), 100);
 		}
 		#endregion
 	}

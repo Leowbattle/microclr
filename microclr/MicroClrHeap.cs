@@ -8,6 +8,8 @@ namespace microclr
 	{
 		internal List<object> Objects { get; } = new List<object>();
 
+		public int Count => Objects.Count;
+
 		public int Add(object o)
 		{
 			int id = Objects.Count;
