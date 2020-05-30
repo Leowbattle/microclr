@@ -792,6 +792,57 @@ namespace microclr
 						break;
 					#endregion
 
+					#region Load static field
+					case OpCodeValues.Ldsfld:
+						var fld = method.Module.ResolveField(ReadInt());
+						var fldVal = fld.GetValue(null);
+						if (fldVal is sbyte)
+						{
+							Stack.PushLong((sbyte)fldVal);
+						}
+						else if (fldVal is byte)
+						{
+							Stack.PushULong((byte)fldVal);
+						}
+						else if (fldVal is short)
+						{
+							Stack.PushLong((short)fldVal);
+						}
+						else if (fldVal is ushort)
+						{
+							Stack.PushULong((ushort)fldVal);
+						}
+						else if (fldVal is int)
+						{
+							Stack.PushLong((int)fldVal);
+						}
+						else if (fldVal is uint)
+						{
+							Stack.PushULong((uint)fldVal);
+						}
+						else if (fldVal is long)
+						{
+							Stack.PushLong((long)fldVal);
+						}
+						else if (fldVal is ulong)
+						{
+							Stack.PushULong((ulong)fldVal);
+						}
+						else if (fldVal is float)
+						{
+							Stack.PushFloat((float)fldVal);
+						}
+						else if (fldVal is double)
+						{
+							Stack.PushDouble((double)fldVal);
+						}
+						else if (fldVal is object)
+						{
+							Stack.Push(new Variable((ulong)Heap.Add(fldVal), VariableType.Object));
+						}
+						break;
+					#endregion
+
 					#region Call
 					case OpCodeValues.Call:
 						var metadataToken = ReadInt();

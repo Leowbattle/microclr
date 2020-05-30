@@ -1952,6 +1952,27 @@ namespace Tests
 		}
 		#endregion
 
+		#region Load static field
+		static string ReturnEmptyString()
+		{
+			return string.Empty;
+		}
+
+		static readonly float f = MathF.PI;
+
+		static float ReturnConstFloat()
+		{
+			return f;
+		}
+
+		[TestMethod]
+		public void TestLoadStaticField()
+		{
+			RunTest(nameof(ReturnEmptyString));
+			RunTest(nameof(ReturnConstFloat));
+		}
+		#endregion
+
 		#region Pop
 		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static void Pop()
