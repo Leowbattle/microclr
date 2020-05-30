@@ -24,7 +24,7 @@ namespace microclr
 
 		public void PushULong(ulong i)
 		{
-			Stack[StackPointer++] = new Variable(i, VariableType.UInt);
+			Stack[StackPointer++] = new Variable(i);
 		}
 
 		public ulong PopULong()
@@ -34,7 +34,7 @@ namespace microclr
 
 		public void PushLong(long i)
 		{
-			Stack[StackPointer++] = new Variable((ulong)i, VariableType.Int);
+			Stack[StackPointer++] = new Variable(i);
 		}
 
 		public long PopLong()
@@ -44,7 +44,7 @@ namespace microclr
 
 		public void PushInt(int i)
 		{
-			Stack[StackPointer++] = new Variable((ulong)i, VariableType.Int);
+			Stack[StackPointer++] = new Variable(i);
 		}
 
 		public int PopInt()
@@ -54,7 +54,7 @@ namespace microclr
 
 		public void PushFloat(float f)
 		{
-			Stack[StackPointer++] = new Variable((ulong)BitConverter.SingleToInt32Bits(f), VariableType.Float);
+			Stack[StackPointer++] = new Variable(f);
 		}
 
 		public float PopFloat()
@@ -64,7 +64,7 @@ namespace microclr
 
 		public void PushDouble(double d)
 		{
-			Stack[StackPointer++] = new Variable((ulong)BitConverter.DoubleToInt64Bits(d), VariableType.Double);
+			Stack[StackPointer++] = new Variable(d);
 		}
 
 		public double PopDouble()

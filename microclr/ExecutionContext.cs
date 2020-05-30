@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using static microclr.MicroClrStack;
 
 namespace microclr
 {
@@ -89,6 +86,10 @@ namespace microclr
 				else if (argT == typeof(double))
 				{
 					ret[i] = new Variable((double)args[i]);
+				}
+				else if (argT == typeof(bool))
+				{
+					ret[i] = new Variable((bool)args[i] ? 1 : 0);
 				}
 				else
 				{
@@ -247,12 +248,71 @@ namespace microclr
 						break;
 					#endregion
 
+					#region Comparisons
+					case OpCodeValues.Ceq:
+						Stack.PushInt(Stack.PopULong() == Stack.PopULong() ? 1 : 0);
+						break;
+					case OpCodeValues.Clt:
+						// Flip the sign because of the order the parameters
+						// are pushed onto the stack.
+						Stack.PushInt(Stack.PopULong() > Stack.PopULong() ? 1 : 0);
+						break;
+					case OpCodeValues.Cgt:
+						Stack.PushInt(Stack.PopULong() < Stack.PopULong() ? 1 : 0);
+						break;
+					#endregion
+
 					#region Branch
 					case OpCodeValues.Br:
 						ip += ReadInt() + 4;
 						break;
 					case OpCodeValues.Br_S:
 						ip += (sbyte)il[ip] + 1;
+						break;
+					case OpCodeValues.Brtrue_S:
+						if (Stack.PopULong() != 0)
+						{
+							ip += (sbyte)il[ip];
+						}
+						ip++;
+						break;
+					case OpCodeValues.Brfalse_S:
+						if (Stack.PopULong() == 0)
+						{
+							ip += (sbyte)il[ip];
+						}
+						ip++;
+						break;
+					//case OpCodeValues.Brtrue:
+					//	if (Stack.PopULong() != 0)
+					//	{
+					//		ip += ReadInt();
+					//		break;
+					//	}
+					//	ip += 4;
+					//	break;
+					//case OpCodeValues.Brfalse:
+					//	if (Stack.PopULong() == 0)
+					//	{
+					//		ip += ReadInt();
+					//		break;
+					//	}
+					//	ip += 4;
+					//	break;
+					//case OpCodeValues.Beq:
+					//	if (Stack.PopULong() == Stack.PopULong())
+					//	{
+					//		ip += ReadInt();
+					//		break;
+					//	}
+					//	ip += 4;
+					//	break;
+					case OpCodeValues.Beq_S:
+						if (Stack.PopULong() == Stack.PopULong())
+						{
+							ip += (sbyte)il[ip];
+						}
+						ip++;
 						break;
 					#endregion
 
@@ -331,6 +391,22 @@ namespace microclr
 							break;
 						}
 						Stack.PushLong(-Stack.PopLong());
+						break;
+					#endregion
+
+					#region Switch
+					case OpCodeValues.Switch:
+						int n = ReadInt();
+						var value = Stack.PopInt();
+						if (value < n && value >= 0)
+						{
+							var jumpTable = MemoryMarshal.Cast<byte, int>(il.AsSpan(ip, n * sizeof(int)));
+							ip += n * sizeof(int) + jumpTable[value];
+						}
+						else
+						{
+							ip += n * sizeof(int);
+						}
 						break;
 					#endregion
 
@@ -420,9 +496,6 @@ namespace microclr
 		public T Execute<T>() where T : unmanaged
 		{
 			return (T)Execute();
-			//Execute();
-			//var ret = Stack.PopULong();
-			//return MemoryMarshal.Cast<ulong, T>(MemoryMarshal.CreateSpan(ref ret, 1))[0];
 		}
 
 		internal string Disassemble()

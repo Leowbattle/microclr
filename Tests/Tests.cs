@@ -1,11 +1,8 @@
 ﻿using microclr;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
 
 namespace Tests
 {
@@ -16,6 +13,8 @@ namespace Tests
 #pragma warning disable CS0219 // Variable assigned but not used
 #pragma warning disable IDE0059// Variable assigned but not used
 #pragma warning disable CS0162 // Unreachable code
+#pragma warning disable HAA0601
+#pragma warning disable HAA0101
 		#endregion
 
 		#region Test executor
@@ -36,6 +35,13 @@ namespace Tests
 			var method = typeof(Tests).GetMethod(name, BindingFlags.NonPublic | BindingFlags.Static);
 			var dotnet = method.Invoke(null, args);
 			var microclr = new MicroClr().Execute(method, args);
+			Assert.AreEqual(dotnet, microclr);
+		}
+
+		static void RunTest(Delegate d, params object[] args)
+		{
+			var dotnet = d.DynamicInvoke(args);
+			var microclr = new MicroClr().Execute(d.Method, args);
 			Assert.AreEqual(dotnet, microclr);
 		}
 		#endregion
@@ -854,6 +860,9 @@ namespace Tests
 			return a + b;
 		}
 
+		/// <summary>
+		/// Loads parameters using Ldarg, Ldarg_S, Ldarg_0, Ldarg_1, Ldarg_2, Ldarg_3
+		/// </summary>
 		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static void HasManyParameters(
 			int arg0,
@@ -1633,6 +1642,90 @@ namespace Tests
 				253,
 				254,
 				255);
+		}
+		#endregion
+
+		#region Comparisons, conditional jumps
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static bool AreEqual(int x, int y)
+		{
+			return x == y;
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static int Fibonacci(int n)
+		{
+			int a = 0;
+			int b = 1;
+			int c = 1;
+
+			for (int i = 0; i < n - 1; i++)
+			{
+				c = a + b;
+				a = b;
+				b = c;
+			}
+
+			return c;
+		}
+
+		[TestMethod]
+		public void TestConditionalJump()
+		{
+			RunTest(nameof(AreEqual), 5, 5);
+			RunTest(nameof(AreEqual), 5, 4);
+			RunTest(nameof(Fibonacci), 10);
+		}
+		#endregion
+
+		#region Switch
+
+		/// <summary>
+		/// The IL for this switch statement will be generated as an if-else if chain.
+		/// </summary>
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static int Switch1(int n)
+		{
+			return n switch
+			{
+				1 => 42,
+				3 => 44,
+				_ => n
+			};
+		}
+
+		/// <summary>
+		/// This switch statement is generated using the CIL switch instruction.
+		/// It seems to use this instruction if each case is within 3 of the previous one.
+		/// The compiler was even smart enough to subtract 1 from n before the switch instruction
+		/// so it starts at 0 and is able to use a jump-table.
+		/// </summary>
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static int Switch2(int n)
+		{
+			return n switch
+			{
+				2 => 2,
+				3 => 3,
+				4 => 50,
+				_ => n
+			};
+		}
+
+		[TestMethod]
+		public void TestSwitch()
+		{
+			RunTest(nameof(Switch1), 0);
+			RunTest(nameof(Switch1), 1);
+			RunTest(nameof(Switch1), 3);
+
+			RunTest(nameof(Switch2), 0);
+			RunTest(nameof(Switch2), 1);
+			RunTest(nameof(Switch2), 2);
+			RunTest(nameof(Switch2), 3);
+			RunTest(nameof(Switch2), 4);
+			RunTest(nameof(Switch2), 5);
+			RunTest(nameof(Switch2), 50);
 		}
 		#endregion
 	}
