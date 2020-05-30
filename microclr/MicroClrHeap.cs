@@ -6,15 +6,19 @@ namespace microclr
 {
 	class MicroClrHeap
 	{
-		internal List<object> Objects { get; } = new List<object>();
+		List<object> Objects { get; } = new List<object>();
 
 		public int Count => Objects.Count;
 
 		public int Add(object o)
 		{
-			int id = Objects.Count;
 			Objects.Add(o);
-			return id;
+			return Objects.Count;
+		}
+
+		public object this[int index]
+		{
+			get => Objects[index - 1];
 		}
 	}
 }

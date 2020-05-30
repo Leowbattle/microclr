@@ -48,7 +48,7 @@ namespace microclr
 			for (int i = 0; i < args.Length; i++)
 			{
 				var p = method.GetParameters()[i];
-				if (p.ParameterType != args[i].GetType())
+				if (!p.ParameterType.IsAssignableFrom(args[i].GetType()))
 				{
 					throw new ParameterTypeException(i, p.ParameterType, args[i].GetType());
 				}
@@ -57,7 +57,7 @@ namespace microclr
 			var ret = new Variable[args.Length];
 			for (int i = 0; i < args.Length; i++)
 			{
-				var argT = args[i].GetType();
+				var argT = method.GetParameters()[i].ParameterType;
 				if (argT == typeof(sbyte))
 				{
 					ret[i] = new Variable((sbyte)args[i]);
@@ -104,7 +104,7 @@ namespace microclr
 				}
 				else if (!argT.IsValueType)
 				{
-					ret[i] = new Variable((ulong)vm.Heap.Add(args[i]));
+					ret[i] = new Variable((ulong)vm.Heap.Add(args[i]), VariableType.Object);
 				}
 				else
 				{
@@ -221,7 +221,7 @@ namespace microclr
 					#region Push literal to the stack
 					case OpCodeValues.Ldnull:
 						//Stack.PushULong(0);
-						Stack.Push(new Variable((ulong)Heap.Add(null), VariableType.Object));
+						Stack.Push(new Variable(0, VariableType.Object));
 						break;
 					case OpCodeValues.Ldc_I4:
 						Stack.PushInt(ReadInt());
@@ -277,9 +277,15 @@ namespace microclr
 					case OpCodeValues.Clt:
 						// Flip the sign because of the order the parameters
 						// are pushed onto the stack.
-						Stack.PushInt(Stack.PopULong() > Stack.PopULong() ? 1 : 0);
+						Stack.PushInt(Stack.PopLong() > Stack.PopLong() ? 1 : 0);
 						break;
 					case OpCodeValues.Cgt:
+						Stack.PushInt(Stack.PopLong() < Stack.PopLong() ? 1 : 0);
+						break;
+					case OpCodeValues.Clt_Un:
+						Stack.PushInt(Stack.PopULong() > Stack.PopULong() ? 1 : 0);
+						break;
+					case OpCodeValues.Cgt_Un:
 						Stack.PushInt(Stack.PopULong() < Stack.PopULong() ? 1 : 0);
 						break;
 					#endregion
@@ -630,6 +636,23 @@ namespace microclr
 							throw new NotSupportedException();
 						}
 						break;
+
+					case OpCodeValues.Castclass:
+						var type = method.Module.ResolveType(ReadInt());
+						var ob = Stack.Pop();
+						//if (ob.Type != VariableType.Object)
+						//{
+						//	throw new InvalidCastException(type, Heap.Objects[(int)ob.Value].GetType());
+						//}
+
+						var real_o = Heap[(int)ob.Value];
+						if (!type.IsAssignableFrom(real_o.GetType()))
+						{
+							throw new InvalidCastException(type, real_o.GetType());
+						}
+
+						Stack.Push(new Variable((ulong)Heap.Add(Convert.ChangeType(real_o, type)), VariableType.Object));
+						break;
 					#endregion
 
 					#region Switch
@@ -713,6 +736,62 @@ namespace microclr
 						break;
 					#endregion
 
+					#region Unbox
+					case OpCodeValues.Unbox:
+					case OpCodeValues.Unbox_Any:
+						o = Heap[Stack.PopInt()];
+						ReadInt();
+						if (o is sbyte)
+						{
+							Stack.PushLong((sbyte)o);
+						}
+						else if (o is byte)
+						{
+							Stack.PushULong((byte)o);
+						}
+						else if (o is short)
+						{
+							Stack.PushLong((short)o);
+						}
+						else if (o is ushort)
+						{
+							Stack.PushULong((ushort)o);
+						}
+						else if (o is int)
+						{
+							Stack.PushLong((int)o);
+						}
+						else if (o is uint)
+						{
+							Stack.PushULong((uint)o);
+						}
+						else if (o is long)
+						{
+							Stack.PushLong((long)o);
+						}
+						else if (o is ulong)
+						{
+							Stack.PushULong((ulong)o);
+						}
+						else if (o is float)
+						{
+							Stack.PushFloat((float)o);
+						}
+						else if (o is double)
+						{
+							Stack.PushDouble((double)o);
+						}
+						break;
+					#endregion
+
+					#region Is instance
+					case OpCodeValues.Isinst:
+						var obj = Heap[Stack.PopInt()];
+						var t = method.Module.ResolveType(ReadInt());
+						Stack.PushInt(t.IsInstanceOfType(obj) ? 1 : 0);
+						break;
+					#endregion
+
 					#region Call
 					case OpCodeValues.Call:
 						var metadataToken = ReadInt();
@@ -785,7 +864,7 @@ namespace microclr
 								}
 								else if (!argT.IsValueType)
 								{
-									args[i] = Heap.Objects[(int)arg.Value];
+									args[i] = Heap[(int)arg.Value];
 								}
 								else
 								{
@@ -911,7 +990,7 @@ namespace microclr
 							}
 							else if (!retType.IsValueType)
 							{
-								return Heap.Objects[(int)ret.Value];
+								return Heap[(int)ret.Value];
 							}
 							else
 							{

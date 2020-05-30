@@ -76,4 +76,18 @@ namespace microclr
 
 		public override string Message => $"Incorrect parameter type {Given} for parameter {Index}, expected {Expected}";
 	}
+
+	public class InvalidCastException : Exception
+	{
+		public Type Tried { get; }
+		public Type Actual { get; }
+
+		public InvalidCastException(Type tried, Type actual)
+		{
+			Tried = tried;
+			Actual = actual;
+		}
+
+		public override string Message => $"Cannot cast {Actual} to {Tried}";
+	}
 }

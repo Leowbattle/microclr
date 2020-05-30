@@ -1922,6 +1922,36 @@ namespace Tests
 		}
 		#endregion
 
+		#region Unbox
+		static int UnboxInt(object o)
+		{
+			return (int)o;
+		}
+
+		[TestMethod]
+		public void TestUnbox()
+		{
+			RunTest(nameof(UnboxInt), 0);
+			RunTest(nameof(UnboxInt), 1);
+			RunTest(nameof(UnboxInt), int.MaxValue);
+		}
+		#endregion
+
+		#region Is instance
+		static bool IsString(object o)
+		{
+			return o is string;
+		}
+
+		[TestMethod]
+		public void TestIsInstance()
+		{
+			RunTest(nameof(IsString), "Hello");
+			RunTest(nameof(IsString), 0);
+			RunTest(nameof(IsString), 10);
+		}
+		#endregion
+
 		#region Pop
 		[MethodImpl(MethodImplOptions.NoOptimization)]
 		static void Pop()
@@ -2276,6 +2306,30 @@ namespace Tests
 			RunTest(nameof(CastFloatToDouble), float.PositiveInfinity);
 			RunTest(nameof(CastFloatToDouble), float.NaN);
 			RunTest(nameof(CastFloatToDouble), float.MaxValue);
+		}
+
+		static string CastObjectToString(object o)
+		{
+			return (string)o;
+		}
+
+		[TestMethod]
+		public void TestCastClass()
+		{
+			RunTest(nameof(CastObjectToString), "Hello");
+		}
+
+		static string InvalidCast()
+		{
+			object o = 1;
+			return (string)o;
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(microclr.InvalidCastException))]
+		public void TestInvalidCast()
+		{
+			Run(nameof(InvalidCast));
 		}
 		#endregion
 	}

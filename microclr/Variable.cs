@@ -56,7 +56,7 @@ namespace microclr
 
 		public override string ToString()
 		{
-			return Type switch
+			var val = Type switch
 			{
 				VariableType.Int => ((long)Value).ToString(),
 				VariableType.UInt => Value.ToString(),
@@ -64,6 +64,7 @@ namespace microclr
 				VariableType.Double => BitConverter.Int64BitsToDouble((long)Value).ToString(),
 				_ => Value.ToString()
 			};
+			return $"{Type} {val}";
 		}
 	}
 }
