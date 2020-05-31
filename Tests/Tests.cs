@@ -2419,6 +2419,30 @@ namespace Tests
 			return s[i];
 		}
 
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static int StoreInIntArray(int i, int x)
+		{
+			int[] arr = { 1, 2, 3, 4, 5 };
+			arr[i] = x;
+			return arr[i];
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static string StoreInStringArray(int i, string s)
+		{
+			string[] strings = { "Annie", "are", "you", "okay" };
+			strings[i] = s;
+			return strings[i];
+		}
+
+		[MethodImpl(MethodImplOptions.NoOptimization)]
+		static float IndexFloatArray(int i)
+		{
+			float[] fa = { 1.0f, 2.0f, 3.14159f };
+			fa[i] = i + MathF.E;
+			return fa[i];
+		}
+
 		[TestMethod]
 		public void TestArrays()
 		{
@@ -2433,6 +2457,16 @@ namespace Tests
 			RunTest(nameof(IndexStringArray), 3);
 
 			RunTest(nameof(IndexString), "hello", 2);
+
+			RunTest(nameof(StoreInIntArray), 0, 42);
+			RunTest(nameof(StoreInIntArray), 3, 10);
+
+			RunTest(nameof(StoreInStringArray), 3, "oh");
+			RunTest(nameof(StoreInStringArray), 3, "wow");
+
+			RunTest(nameof(IndexFloatArray), 0);
+			RunTest(nameof(IndexFloatArray), 1);
+			RunTest(nameof(IndexFloatArray), 2);
 		}
 		#endregion
 

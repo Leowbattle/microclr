@@ -818,6 +818,27 @@ namespace microclr
 						Stack.PushInt(arr[index]);
 						break;
 
+					case OpCodeValues.Stelem_I:
+					case OpCodeValues.Stelem_I4:
+						var intVal = Stack.PopInt();
+						index = Stack.PopInt();
+						arr = (int[])Heap[Stack.PopInt()];
+						arr[index] = intVal;
+						break;
+
+					case OpCodeValues.Ldelem_R4:
+						index = Stack.PopInt();
+						var fltArr = (float[])Heap[Stack.PopInt()];
+						Stack.PushFloat(fltArr[index]);
+						break;
+
+					case OpCodeValues.Stelem_R4:
+						var floatVal = Stack.PopFloat();
+						index = Stack.PopInt();
+						fltArr = (float[])Heap[Stack.PopInt()];
+						fltArr[index] = floatVal;
+						break;
+
 					case OpCodeValues.Ldelem_Ref:
 						index = Stack.PopInt();
 						var oarr = (object[])Heap[Stack.PopInt()];
