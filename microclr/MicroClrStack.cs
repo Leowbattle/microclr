@@ -7,6 +7,11 @@ namespace microclr
 		Variable[] Stack = new Variable[1024];
 		int StackPointer = 0;
 
+		public void Clear()
+		{
+			StackPointer = 0;
+		}
+
 		public Variable Peek()
 		{
 			return Stack[StackPointer - 1];

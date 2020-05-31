@@ -16,6 +16,11 @@ namespace microclr
 			return Objects.Count;
 		}
 
+		public void Clear()
+		{
+			Objects.Clear();
+		}
+
 		public object this[int index]
 		{
 			get => Objects[index - 1];

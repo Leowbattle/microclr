@@ -31,6 +31,8 @@ namespace TestProgram
 		{
 			var clr = new MicroClr();
 
+			Fibonacci(10);
+
 			var method = typeof(Program).GetMethod(nameof(Fibonacci));
 			var ret = clr.Execute(method, 10);
 			Console.WriteLine(ret);
