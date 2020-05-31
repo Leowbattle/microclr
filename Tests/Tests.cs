@@ -2443,6 +2443,12 @@ namespace Tests
 			return fa[i];
 		}
 
+		static int GetArrayLength()
+		{
+			int[] arr = { 1, 2, 3, 4, 5, 6 };
+			return arr.Length;
+		}
+
 		[TestMethod]
 		public void TestArrays()
 		{
@@ -2467,6 +2473,8 @@ namespace Tests
 			RunTest(nameof(IndexFloatArray), 0);
 			RunTest(nameof(IndexFloatArray), 1);
 			RunTest(nameof(IndexFloatArray), 2);
+
+			RunTest(nameof(GetArrayLength));
 		}
 		#endregion
 

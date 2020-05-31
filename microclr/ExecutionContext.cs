@@ -808,9 +808,12 @@ namespace microclr
 						var array = Array.CreateInstance(etype, length);
 						Stack.Push(new Variable((ulong)Heap.Add(array), VariableType.Object));
 						break;
-					// TODO Ldlen
-					//case OpCodeValues.Ldlen:
-					//	break;
+
+					case OpCodeValues.Ldlen:
+						array = (Array)Heap[Stack.PopInt()];
+						Stack.PushInt(array.Length);
+						break;
+
 					case OpCodeValues.Ldelem_I:
 					case OpCodeValues.Ldelem_I4:
 						var index = Stack.PopInt();
