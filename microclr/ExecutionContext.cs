@@ -328,6 +328,14 @@ namespace microclr
 						}
 						ip++;
 						break;
+
+					case OpCodeValues.Blt_S:
+						var target = (sbyte)il[ip++];
+						if (Stack.PopULong() > Stack.PopULong())
+						{
+							ip += target;
+						}
+						break;
 					//case OpCodeValues.Brtrue:
 					//	if (Stack.PopULong() != 0)
 					//	{
