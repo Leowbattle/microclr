@@ -408,6 +408,11 @@ namespace Tests
 			return 2.71828;
 		}
 
+		static char ReturnsChar()
+		{
+			return 'a';
+		}
+
 		[TestMethod]
 		public void TestSimpleReturn()
 		{
@@ -415,6 +420,7 @@ namespace Tests
 			RunTest(nameof(ReturnLargeInt));
 			RunTest(nameof(ReturnFloat));
 			RunTest(nameof(ReturnDouble));
+			RunTest(nameof(ReturnsChar));
 		}
 
 		[TestMethod]
@@ -1522,10 +1528,18 @@ namespace Tests
 			x = arg255;
 		}
 
+		static bool IsLowercase(char c)
+		{
+			return char.IsLower(c);
+		}
+
 		[TestMethod]
 		public void TestSimpleArguments()
 		{
 			RunTest(nameof(Add), 5, 2);
+			RunTest(nameof(IsLowercase), 'a');
+			RunTest(nameof(IsLowercase), 'A');
+			RunTest(nameof(IsLowercase), '1');
 			RunTest(
 				nameof(HasManyParameters),
 				0,
@@ -2399,6 +2413,12 @@ namespace Tests
 			return strings[i];
 		}
 
+		static char IndexString(string s, int i)
+		{
+			int x = s.Length;
+			return s[i];
+		}
+
 		[TestMethod]
 		public void TestArrays()
 		{
@@ -2411,6 +2431,31 @@ namespace Tests
 			RunTest(nameof(IndexStringArray), 1);
 			RunTest(nameof(IndexStringArray), 2);
 			RunTest(nameof(IndexStringArray), 3);
+
+			RunTest(nameof(IndexString), "hello", 2);
+		}
+		#endregion
+
+		#region Virtual method call
+		class HasVirtualMethod
+		{
+			public virtual void VirtualMethod()
+			{
+
+			}
+		}
+		static readonly HasVirtualMethod hasVirtualMethod = new HasVirtualMethod();
+
+		static void CallVirtual()
+		{
+			hasVirtualMethod.VirtualMethod();
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(UnsupportedInstructionException))]
+		public void TestVirtualCallFails()
+		{
+			Run(nameof(CallVirtual));
 		}
 		#endregion
 

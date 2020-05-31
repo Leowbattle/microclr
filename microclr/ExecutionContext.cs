@@ -18,7 +18,9 @@ namespace microclr
 		MicroClrStack Stack;
 		MicroClrHeap Heap;
 
-		private static readonly MethodInfo initArray = typeof(RuntimeHelpers).GetMethod("InitializeArray");
+		private static readonly MethodInfo initArray = typeof(RuntimeHelpers).GetMethod("InitializeArray")!;
+		private static readonly MethodInfo indexStr = typeof(string).GetMethod("get_Chars", new Type[] { typeof(int) })!;
+		private static readonly MethodInfo strLength = typeof(string).GetMethod("get_Length")!;
 
 		public ExecutionContext(MethodInfo method, object[] args, MicroClr vm) : this(method, ConvertArgs(vm, method, args), vm)
 		{
@@ -104,6 +106,10 @@ namespace microclr
 				else if (argT == typeof(bool))
 				{
 					ret[i] = new Variable((bool)args[i] ? 1 : 0);
+				}
+				else if (argT == typeof(char))
+				{
+					ret[i] = new Variable((int)(char)args[i]);
 				}
 				else if (!argT.IsValueType)
 				{
@@ -802,6 +808,9 @@ namespace microclr
 						var array = Array.CreateInstance(etype, length);
 						Stack.Push(new Variable((ulong)Heap.Add(array), VariableType.Object));
 						break;
+					// TODO Ldlen
+					//case OpCodeValues.Ldlen:
+					//	break;
 					case OpCodeValues.Ldelem_I:
 					case OpCodeValues.Ldelem_I4:
 						var index = Stack.PopInt();
@@ -819,6 +828,24 @@ namespace microclr
 						index = Stack.PopInt();
 						oarr = (object[])Heap[Stack.PopInt()];
 						oarr[index] = refVal;
+						break;
+
+					case OpCodeValues.Callvirt:
+						var virt = method.Module.ResolveMethod(ReadInt());
+						if (virt == strLength)
+						{
+							Stack.PushInt(((string)Heap[Stack.PopInt()]).Length);
+						}
+						else if (virt == indexStr)
+						{
+							var charIndex = Stack.PopInt();
+							var s = (string)Heap[Stack.PopInt()];
+							Stack.PushInt(s[charIndex]);
+						}
+						else
+						{
+							goto default;
+						}
 						break;
 					#endregion
 
@@ -956,6 +983,10 @@ namespace microclr
 								{
 									args[i] = arg.Value == 1 ? true : false;
 								}
+								else if (argT == typeof(char))
+								{
+									args[i] = (char)arg.Value;
+								}
 								else if (!argT.IsValueType)
 								{
 									args[i] = Heap[(int)arg.Value];
@@ -1012,6 +1043,10 @@ namespace microclr
 								else if (retT == typeof(bool))
 								{
 									Stack.Push(new Variable((bool)ret ? 1 : 0));
+								}
+								else if (retT == typeof(char))
+								{
+									Stack.PushInt((char)ret);
 								}
 								else if (!retT.IsValueType)
 								{
@@ -1081,6 +1116,10 @@ namespace microclr
 							else if (retType == typeof(bool))
 							{
 								return ret.Value != 0;
+							}
+							else if (retType == typeof(char))
+							{
+								return (char)ret.Value;
 							}
 							else if (!retType.IsValueType)
 							{
